@@ -1,16 +1,19 @@
-# wgetjs [![NPM version](https://badge.fury.io/js/wgetjs.png?branch=master)](http://badge.fury.io/js/wgetjs) [![Build Status](https://travis-ci.org/angleman/wgetjs.png?branch=master)](https://travis-ci.org/angleman/wgetjs) [![Dependency Status](https://gemnasium.com/angleman/wgetjs.png?branch=master)](https://gemnasium.com/angleman/wgetjs) [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](#licensemit)
+# node-wget-js
+
+[![Dependencies Status][david-image]][david-url] [![Build Status](https://travis-ci.org/techno-express/node-wget.png?branch=master)](https://travis-ci.org/techno-express/node-wget) [![Code coverage][coveralls-image]][coveralls-url] [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
+
 Ultra simple async retrieval of remote files over http or https inspired by wgetjs
 
 ## Install
 
 ```
-npm install node-wget
+npm install node-wget-js
 ```
 
 ## Usage
 
 ```javascript
-var wget = require('node-wget');
+var wget = require('node-wget-js');
 
 wget(url);
 
@@ -24,12 +27,12 @@ wget({url: url, dry: true}); // dry run, nothing loaded, callback passing parsed
 ## Examples
 
 ```javascript
-var wget = require('node-wget');
+var wget = require('node-wget-js');
 
-wget('https://raw.github.com/angleman/wgetjs/master/angleman.png');   // angleman.png saved to current folder
+wget('https://raw.github.com/techno-express/node-wget/master/angleman.png');   // angleman.png saved to current folder
 
 wget({
-        url:  'https://raw.github.com/angleman/wgetjs/master/package.json',
+        url:  'https://raw.github.com/techno-express/node-wget/master/package.json',
         dest: '/tmp/',      // destination path or path with filenname, default is ./
         timeout: 2000       // duration to wait for request fulfillment in milliseconds, default is 2 seconds
     },
@@ -48,7 +51,7 @@ wget({
 
 // dry run
 wget({
-    url: 'https://raw.github.com/angleman/wgetjs/master/package.json',
+    url: 'https://raw.github.com/techno-express/node-wget/master/package.json',
     dest: '/tmp/',
     dry: true
     }, function(err, data) {        // data: { headers:{...}, filepath:'...' }
@@ -63,7 +66,7 @@ wget({
 Install:
 
 ```bash
-$ npm install -g node-wget
+$ npm install -g node-wget-js
 ```
 
 Use:
@@ -89,3 +92,14 @@ $ wget https://github.com/NodeOS/NodeOS/archive/master.zip -d path/to/here/
 ```
 
 ## License: MIT
+
+[david-url]: https://david-dm.org/techno-express/node-wget
+[david-image]: http://img.shields.io/david/techno-express/node-wget.svg
+[appveyor-url]: https://ci.appveyor.com/project/techno-express/node-wget
+[appveyor-image]: https://ci.appveyor.com/api/projects/status/sivpio3bq2k3070a/branch/master?svg=true
+[codeclimate-url]: https://codeclimate.com/github/techno-express/node-wget/maintainability
+[codeclimate-image]: https://api.codeclimate.com/v1/badges/0d6a0bc69a8ea29c7de9/maintainability
+[coveralls-url]: https://coveralls.io/github/techno-express/node-wget
+[coveralls-image]: https://coveralls.io/repos/github/techno-express/node-wget/badge.svg
+[npm-url]: https://www.npmjs.org/package/node-wget-js
+[npm-image]: http://img.shields.io/npm/v/node-wget-js.svg
