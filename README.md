@@ -2,7 +2,11 @@
 
 [![Dependencies Status][david-image]][david-url] [![Build Status](https://travis-ci.org/techno-express/node-wget.png?branch=master)](https://travis-ci.org/techno-express/node-wget) [![Code coverage][coveralls-image]][coveralls-url] [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
 
-Ultra simple async retrieval of remote files over http or https inspired by wgetjs
+Ultra simple async retrieval of remote files over http or https inspired by wgetjs.
+
+This is a fork of [node-wget](https://www.npmjs.com/package/node-wget), which still uses [request](https://www.npmjs.com/package/request) that's now deprecated and using the vulnerability version.
+
+This package is rewritten to use [node-fetch](https://www.npmjs.com/package/node-fetch).
 
 ## Install
 
