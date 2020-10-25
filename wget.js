@@ -1,27 +1,28 @@
-var fs      = require('fs'),
-   request = require('request') // mikeal/request
-;
+const fs = require('fs'),
+	fetch = require('node-fetch');
 
 
 function wget(options, callback) {
 	if (typeof options === 'string') {
-		options  = { url: options };
+		options = {
+			url: options
+		};
 	}
-	options      = options  || {};
-	callback     = callback || function (){};
-	var src      = options.url || options.uri || options.src,
-	    parts    = src.split('/'),
-	    file     = parts[parts.length-1]
-	;
-	parts        = file.split('?');
-	file         = parts[0];
-	parts        = file.split('#');
-	file         = parts[0];
+	options = options || {};
+	callback = callback || function () {};
+	var src = options.url || options.uri || options.src,
+		parts = src.split('/'),
+		file = parts[parts.length - 1];
+	parts = file.split('?');
+	file = parts[0];
+	parts = file.split('#');
+	file = parts[0];
 	options.dest = options.dest || './';
-	if (options.dest.substr(options.dest.length-1,1) == '/') {
+	if (options.dest.substr(options.dest.length - 1, 1) == '/') {
 		options.dest = options.dest + file;
 	}
 
+	timer = options.timeout || 2000;
 
 	function handle_request_callback(err, res, body) {
 		if (err) {
@@ -37,16 +38,26 @@ function wget(options, callback) {
 		}
 	}
 
-
 	if (options.dry) {
-		handle_request_callback(null, {}, { filepath: options.dest });
+		handle_request_callback(null, {}, {
+			filepath: options.dest
+		});
 		return options.dest;
 	} else {
-		try {
-			request(options, handle_request_callback).pipe(fs.createWriteStream(options.dest));
-		} catch (err) {
-			callback(err);
-		}
+		fetch(src, {
+				timeout: timer
+			})
+			.then(res => {
+				res.body.pipe(fs.createWriteStream(options.dest));
+				handle_request_callback(null, {
+					headers: res.headers.raw()
+				}, {
+					bodyUsed: res.bodyUsed,
+					size: res.size,
+					timeout: res.timeout
+				});
+			})
+			.catch(err => callback(err));
 	}
 }
 

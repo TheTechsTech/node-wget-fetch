@@ -1,12 +1,11 @@
 {
   "name": "node-wget-js",
-  "version": "0.4.4",
-  "description": "Ultra simple async retrieval of remote files over http or https, a fork of tylerl0706/wgetjs",
+  "version": "1.0.0",
+  "description": "Ultra simple async retrieval of remote files over http or https, a fork of `node-wget`",
   "main": "wget.js",
   "scripts": {
     "test": "mocha -R list test/*.js",
     "TESTS.md": "mocha -R markdown test/*.js > TESTS.md",
-    "coverage": "istanbul cover node_modules/mocha/bin/_mocha --dir .tmp/coverage",
     "coveralls": "npm install coveralls && cat .tmp/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
@@ -21,26 +20,23 @@
     "http",
     "https"
   ],
-  "author": "tylerl0706",
+  "author": "l. stubbs <technoexpressnet@gmail.com>",
   "contributors": [
-    "l. stubbs <technoexpressnet@gmail.com>"
+    "tylerl0706",
+    "angleman"
   ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/techno-express/node-wget/issues"
   },
-  "engines": {
-    "node": ">=0.8.6"
-  },
   "bin": {
     "wget": "cli.js"
   },
   "dependencies": {
-    "request": "^2.88.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "~2.6.1"
   },
   "devDependencies": {
-    "istanbul": "^0.4.5",
+    "coveralls": "^3.1.0",
     "mocha": "^6.2.0",
     "should": "~13.2.1"
   }
