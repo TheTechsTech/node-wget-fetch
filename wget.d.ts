@@ -1,1 +1,1 @@
-export const wget: () => any
+export const wget: () => Promise<any>
