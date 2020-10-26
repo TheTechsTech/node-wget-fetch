@@ -5,8 +5,7 @@
   "main": "wget.js",
   "scripts": {
     "test": "mocha -R list test/*.js",
-    "TESTS.md": "mocha -R markdown test/*.js > TESTS.md",
-    "coveralls": "npm install coveralls && cat .tmp/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "TESTS.md": "mocha -R markdown test/*.js > TESTS.md"
   },
   "repository": {
     "type": "git",
@@ -36,7 +35,6 @@
     "node-fetch": "~2.6.1"
   },
   "devDependencies": {
-    "coveralls": "^3.1.0",
     "mocha": "^6.2.0",
     "should": "~13.2.1"
   }
