@@ -66,16 +66,28 @@ function wget(url, action, options = {}) {
 						return new Promise((resolve) => resolve(res.body));
 					default:
 						return new Promise((resolve, reject) => {
-							const writer = fs.createWriteStream(destination);
+							const fileSize = Number.isInteger(res.headers.get('content-length') - 0) ?
+								parseInt(res.headers['content-length']) :
+								0;
+							var downloadedSize = 0;
+							const writer = fs.createWriteStream(destination, {
+								flags: 'w+',
+								encoding: 'binary'
+							});
 							res.body.pipe(writer);
 
+							res.body.on('data', function (chunk) {
+								downloadedSize += chunk.length;
+							});
+
 							writer.on('finish', () => {
+								writer.end();
 								var data = {
-									filepath: destination
+									filepath: destination,
+									downloadSize: downloadedSize
 								};
 
 								data.headers = res.headers.raw();
-								data.bodyUsed = res.bodyUsed;
 								return resolve(data);
 							});
 							writer.on('error', reject);

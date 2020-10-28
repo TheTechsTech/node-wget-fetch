@@ -46,6 +46,7 @@ describe('node-wget-js', function () {
             wget(src_url, dst_path)
                 .then(data => {
                     holdData = data;
+                    fs.unlinkSync(dst_path);
                     done(); // complete the async beforeEach
                 })
                 .catch(err => {
