@@ -16,12 +16,11 @@ describe('node-wget-js', function () {
             should.exist(wget);
         });
 
-        var  wget = require('../wget.js');
+        var wget = require('../wget.js');
 
         it("return relative filepath: " + rel_path, function () {
-            wget({
-                dry: true,
-                url: rel_path
+            wget(rel_path, {
+                dry: true
             }).then(result => {
                 should.exist(result);
                 result.filepath.should.equal(rel_path);
@@ -29,13 +28,12 @@ describe('node-wget-js', function () {
         });
 
         it("return absolute filepath: " + dst_path, function () {
-            var testPath = wget({
-                dry: true,
-                dest: dst_dir,
-                url: src_url
-            });
-            should.exist(testPath);
-            testPath.should.equal(dst_path);
+            wget(src_url, dst_dir, {
+                dry: true
+            }).then(testPath => {
+                should.exist(testPath);
+                testPath.filepath.should.equal(dst_path);
+            });;
         });
 
         var flag = false;
@@ -45,15 +43,14 @@ describe('node-wget-js', function () {
         beforeEach(function (done) {
             this.timeout(15 * 60 * 1000); // give it 15 seconds instead of 2
 
-            wget({
-                url: src_url,
-                dest: dst_path
-            }, function (err, data) {
-                holdErr = err;
-                holdData = data;
-                done(); // complete the async beforeEach
-            });
-
+            wget(src_url, dst_path)
+                .then(data => {
+                    holdData = data;
+                    done(); // complete the async beforeEach
+                })
+                .catch(err => {
+                    holdErr = err;
+                });
         });
 
         it("load " + dst_path + " from " + src_url, function () {

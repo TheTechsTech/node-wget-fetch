@@ -13,34 +13,43 @@ const fs = require('fs'),
  * @return Promise
  */
 function wget(url, action, options = {}) {
-	if (typeof action === 'string' && ['array', 'buffer', 'blob', 'json', 'text', 'converted', 'stream'].includes(action)) {
-		options.action = action;
-		options.dest = './';
-	} else {
-		options.dest = action || './';
-	}
-
-	var src = url || options.uri || options.url || options.href,
+	var src = url,
+		destination = action || './',
 		parts = src.split('/'),
 		file = parts[parts.length - 1];
 	parts = file.split('?');
 	file = parts[0];
 	parts = file.split('#');
 	file = parts[0];
-	if (options.dest.substr(options.dest.length - 1, 1) == '/') {
-		options.dest = options.dest + file;
+
+	if (typeof action === 'string' && ['array', 'buffer', 'blob', 'json', 'text', 'converted', 'stream'].includes(action)) {
+		destination = './';
+	} else if (typeof action === 'object') {
+		options = action;
+		destination = './';
+		action = 'stream';
+		if (options.action) {
+			action = options.action;
+			delete options.action;
+		}
+	} else {
+		action = 'download';
+	}
+
+	if (destination.substr(destination.length - 1, 1) == '/') {
+		destination = destination + file;
 	}
 
 	if (options.dry) {
 		return new Promise((resolve) => {
 			resolve({
-				filepath: options.dest
+				filepath: destination
 			});
 		});
 	} else {
 		return fetch(src, options)
 			.then(res => {
-				switch (options.action) {
+				switch (action) {
 					case 'array':
 						return res.arrayBuffer();
 					case 'buffer':
@@ -57,12 +66,12 @@ function wget(url, action, options = {}) {
 						return new Promise((resolve) => resolve(res.body));
 					default:
 						return new Promise((resolve, reject) => {
-							const writer = fs.createWriteStream(options.dest);
+							const writer = fs.createWriteStream(destination);
 							res.body.pipe(writer);
 
 							writer.on('finish', () => {
 								var data = {
-									filepath: options.dest
+									filepath: destination
 								};
 
 								data.headers = res.headers.raw();

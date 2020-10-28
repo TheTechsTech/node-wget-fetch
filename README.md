@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/node-wget-js.png)](https://nodei.co/npm/node-wget-js/)
 
-[![Dependencies Status][david-image]][david-url] ![Node.js CI](https://github.com/techno-express/node-wget-js/workflows/Node.js%20CI/badge.svg) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
+[![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget-js/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget-js/actions) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
 
 Ultra simple async retrieval of remote files over http or https inspired by [wgetjs](https://www.npmjs.com/package/wgetjs).
 
