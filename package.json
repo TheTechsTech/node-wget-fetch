@@ -1,6 +1,6 @@
 {
   "name": "node-wget-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ultra simple async retrieval of remote files over http or https, a fork of `node-wget`",
   "main": "wget.js",
   "scripts": {
@@ -32,7 +32,7 @@
     "wget": "cli.js"
   },
   "dependencies": {
-    "node-fetch": "~2.6.1"
+    "request": "^2.88.0"
   },
   "devDependencies": {
     "mocha": "^6.2.0",

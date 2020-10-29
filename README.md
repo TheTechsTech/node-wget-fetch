@@ -1,18 +1,12 @@
 # node-wget-js
 
-[![NPM](https://nodei.co/npm/node-wget-js.png)](https://nodei.co/npm/node-wget-js/)
+[![Dependencies Status][david-image]][david-url] [![Build Status](https://travis-ci.org/techno-express/node-wget.png?branch=master)](https://travis-ci.org/techno-express/node-wget) [![Code coverage][coveralls-image]][coveralls-url] [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
 
-[![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget-js/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget-js/actions) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
-
-Ultra simple async retrieval of remote files over http or https inspired by [wgetjs](https://www.npmjs.com/package/wgetjs).
-
-This is a fork of [node-wget](https://www.npmjs.com/package/node-wget), which still uses [request](https://www.npmjs.com/package/request) that's now deprecated and using the vulnerability version.
-
-This package is rewritten to use [node-fetch](https://www.npmjs.com/package/node-fetch).
+Ultra simple async retrieval of remote files over http or https inspired by wgetjs
 
 ## Install
 
-```bash
+```
 npm install node-wget-js
 ```
 
@@ -39,7 +33,7 @@ wget('https://raw.github.com/techno-express/node-wget/master/angleman.png');   /
 
 wget({
         url:  'https://raw.github.com/techno-express/node-wget/master/package.json',
-        dest: '/tmp/',      // destination path or path with filename, default is ./
+        dest: '/tmp/',      // destination path or path with filenname, default is ./
         timeout: 2000       // duration to wait for request fulfillment in milliseconds, default is 2 seconds
     },
     function (error, response, body) {
@@ -50,7 +44,7 @@ wget({
             console.log('--- headers:');
             console.log(response.headers); // response headers
             console.log('--- body:');
-            console.log(body);             // body properties { bodyUsed: true, size: 1059, timeout: 2000 }
+            console.log(body);             // content of package
         }
     }
 );
@@ -72,7 +66,7 @@ wget({
 Install:
 
 ```bash
-npm install -g node-wget-js
+$ npm install -g node-wget-js
 ```
 
 Use:
