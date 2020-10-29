@@ -1,5 +1,5 @@
 {
-  "name": "node-wget-js",
+  "name": "node-wget-fetch",
   "version": "1.0.0",
   "description": "Ultra simple async retrieval of remote files over http or https, a fork of `node-wget`",
   "main": "wget.js",

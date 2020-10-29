@@ -1,25 +1,22 @@
-# node-wget-js
+# node-wget-fetch
 
-[![NPM](https://nodei.co/npm/node-wget-js.png)](https://nodei.co/npm/node-wget-js/)
+[![NPM](https://nodei.co/npm/node-wget-fetch.png)](https://nodei.co/npm/node-wget-fetch/)
 
-[![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget-js/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget-js/actions) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
+[![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget/actions) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
 
-Ultra simple async retrieval of remote files over http or https inspired by [wgetjs](https://www.npmjs.com/package/wgetjs).
+Ultra simple async retrieval of remote files over http or https using [node-fetch](https://www.npmjs.com/package/node-fetch).
 
-This is a fork of [node-wget](https://www.npmjs.com/package/node-wget), which still uses [request](https://www.npmjs.com/package/request) that's now deprecated and using the vulnerability version.
-
-This package is rewritten to use [node-fetch](https://www.npmjs.com/package/node-fetch).
 
 ## Install
 
 ```bash
-npm install node-wget-js
+npm install node-wget-fetch
 ```
 
 ## Usage
 
 ```javascript
-var wget = require('node-wget-js');
+var wget = require('node-wget-fetch');
 
 wget(url);
 
@@ -33,7 +30,7 @@ wget({url: url, dry: true}); // dry run, nothing loaded, callback passing parsed
 ## Examples
 
 ```javascript
-var wget = require('node-wget-js');
+var wget = require('node-wget-fetch');
 
 wget('https://raw.github.com/techno-express/node-wget/master/angleman.png');   // angleman.png saved to current folder
 
@@ -72,7 +69,7 @@ wget({
 Install:
 
 ```bash
-npm install -g node-wget-js
+npm install -g node-wget-fetch
 ```
 
 Use:
@@ -101,11 +98,9 @@ $ wget https://github.com/NodeOS/NodeOS/archive/master.zip -d path/to/here/
 
 [david-url]: https://david-dm.org/techno-express/node-wget
 [david-image]: http://img.shields.io/david/techno-express/node-wget.svg
-[appveyor-url]: https://ci.appveyor.com/project/techno-express/node-wget
-[appveyor-image]: https://ci.appveyor.com/api/projects/status/sivpio3bq2k3070a/branch/master?svg=true
 [codeclimate-url]: https://codeclimate.com/github/techno-express/node-wget/maintainability
 [codeclimate-image]: https://api.codeclimate.com/v1/badges/0d6a0bc69a8ea29c7de9/maintainability
 [coveralls-url]: https://coveralls.io/github/techno-express/node-wget
 [coveralls-image]: https://coveralls.io/repos/github/techno-express/node-wget/badge.svg
-[npm-url]: https://www.npmjs.org/package/node-wget-js
-[npm-image]: http://img.shields.io/npm/v/node-wget-js.svg
+[npm-url]: https://www.npmjs.org/package/node-wget-fetch
+[npm-image]: http://img.shields.io/npm/v/node-wget-fetch.svg
