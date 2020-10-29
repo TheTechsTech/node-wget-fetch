@@ -84,7 +84,8 @@ function wget(url, action, options = {}) {
 								writer.end();
 								var data = {
 									filepath: destination,
-									downloadSize: downloadedSize
+									fileSize: downloadedSize,
+									transferSizeMatch: (fileSize === downloadedSize)
 								};
 
 								data.headers = res.headers.raw();
