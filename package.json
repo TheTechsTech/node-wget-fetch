@@ -1,11 +1,10 @@
 {
   "name": "node-wget-fetch",
   "version": "1.0.0",
-  "description": "Ultra simple async retrieval of remote files over http or https, a fork of `node-wget`",
-  "main": "wget.js",
+  "description": "Ultra simple async retrieval of remote files over http or https by way of node-fetch.",
+  "main": "wget-fetch.js",
   "scripts": {
-    "test": "mocha -R list test/*.js",
-    "TESTS.md": "mocha -R markdown test/*.js > TESTS.md"
+    "test": "mocha -R list test/*.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +16,8 @@
     "download",
     "file",
     "http",
-    "https"
+    "https",
+    "fetch"
   ],
   "author": "l. stubbs <technoexpressnet@gmail.com>",
   "contributors": [
@@ -29,7 +29,8 @@
     "url": "https://github.com/techno-express/node-wget/issues"
   },
   "bin": {
-    "wget": "cli.js"
+    "wget": "cli.js",
+    "fetch": "cli.js"
   },
   "dependencies": {
     "node-fetch": "~2.6.1"

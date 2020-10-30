@@ -4,7 +4,7 @@
 
 [![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget/actions) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
 
-Ultra simple async retrieval of remote files over http or https using [node-fetch](https://www.npmjs.com/package/node-fetch).
+Ultra simple async retrieval of remote files over http or https by way of [node-fetch](https://www.npmjs.com/package/node-fetch).
 
 
 ## Install
@@ -16,51 +16,63 @@ npm install node-wget-fetch
 ## Usage
 
 ```javascript
-var wget = require('node-wget-fetch');
+const wget = require('node-wget-fetch');
 
-wget(url);
+wget(url) // retrieve to current directory
+    .then((info) => {});
+    .catch((error) => {});
 
-wget(url, callback);
+wget(url, options) // optional: `Fetch` Options
+    .then((info) => {});
+    .catch((error) => {});
 
-wget({url: url, dest: destination_folder_or_filename}, callback);
+wget(url, destination_folder_or_filename, options)  // optional: `Fetch` Options
+    .then((info) => {});
+    .catch((error) => {});
 
-wget({url: url, dry: true}); // dry run, nothing loaded, callback passing parsed options as data
+
+wget(url, responseAction, // *responseAction* can be:
+    //  'array' for arrayBuffer()
+    //  'buffer' for buffer()
+    //  'blob' for blob()
+    //  'json' for json()
+    //  'text' for text()
+    //  'converted' for textConverted()
+    //  'stream' for NodeJs.readableStream()
+    { options }  // optional: `Fetch` Options
+    )
+    .then((responseBody) => {
+        // No file is retrieved/saved,
+        // an resolved `Fetch` response body of above type is returned
+    });
+    .catch((error) => {});
 ```
 
 ## Examples
 
 ```javascript
-var wget = require('node-wget-fetch');
+const wget = require('node-wget-fetch');
 
-wget('https://raw.github.com/techno-express/node-wget/master/angleman.png');   // angleman.png saved to current folder
+wget('https://raw.github.com/techno-express/node-wget/master/angleman.png'); // angleman.png saved to current folder
 
-wget({
-        url:  'https://raw.github.com/techno-express/node-wget/master/package.json',
-        dest: '/tmp/',      // destination path or path with filename, default is ./
-        timeout: 2000       // duration to wait for request fulfillment in milliseconds, default is 2 seconds
-    },
-    function (error, response, body) {
-        if (error) {
-            console.log('--- error:');
-            console.log(error);            // error encountered
-        } else {
-            console.log('--- headers:');
-            console.log(response.headers); // response headers
-            console.log('--- body:');
-            console.log(body);             // body properties { bodyUsed: true, size: 1059, timeout: 2000 }
-        }
-    }
-);
-
-// dry run
-wget({
-    url: 'https://raw.github.com/techno-express/node-wget/master/package.json',
-    dest: '/tmp/',
-    dry: true
-    }, function(err, data) {        // data: { headers:{...}, filepath:'...' }
-        console.log('--- dry run data:');
-        console.log(data); // '/tmp/package.json'
-    }
+wget('https://raw.github.com/techno-express/node-wget/master/package.json',
+    '/tmp/', // destination path or path with filename, default is ./
+    { timeout: 2000 } // Any `Fetch` Options, this sets duration to wait for request in milliseconds, default 0
+    )
+    .then((info) => {
+        console.log('--- headers:'); // display all response headers
+        console.log(info.headers);
+        console.log('--- file path:'); // display file retrieved info
+        console.log(info.filepath);
+        console.log('--- file size retrieved:');
+        console.log(info.fileSize);
+        console.log('--- Do file retrieved match "Content-Length"?:');
+        console.log(info.retrievedSizeMatch);
+    })
+    .catch((error) => {
+        console.log('--- error:');
+        console.log(error); // error encountered
+    });
 );
 ```
 
@@ -77,6 +89,10 @@ Use:
 ```text
 Usage: wget [options] <url>
 
+Or
+
+Usage: fetch [options] <url>
+
 Ultra simple async retrieval of remote files over http or https
 
 Options:
@@ -89,9 +105,11 @@ Usage:
 
 # Download file
 $ wget https://github.com/NodeOS/NodeOS/archive/master.zip
+$ fetch https://github.com/NodeOS/NodeOS/archive/master.zip
 
 # Download file to location
 $ wget https://github.com/NodeOS/NodeOS/archive/master.zip -d path/to/here/
+$ fetch https://github.com/NodeOS/NodeOS/archive/master.zip -d path/to/here/
 ```
 
 ## License: MIT

@@ -4,15 +4,15 @@ const fs = require('fs'),
 	fetch = require('node-fetch');
 
 /**
- * Retrieval of remote files over http or https using `node-fetch`
+ * Retrieval of remote files over http or https by way of `node-fetch`
  *
  * @param String url Absolute url of source
- * @param Mixed action Save destination or Body action on Response
+ * @param Mixed action Save to destination or Body action on Response
  * @param Object options Fetch/Request options
  *
  * @return Promise
  */
-function wget(url, action, options = {}) {
+function wget(url, action = '', options = {}) {
 	var src = url,
 		destination = action || './',
 		parts = src.split('/'),
@@ -82,14 +82,14 @@ function wget(url, action, options = {}) {
 
 							writer.on('finish', () => {
 								writer.end();
-								var data = {
+								var info = {
 									filepath: destination,
 									fileSize: downloadedSize,
-									transferSizeMatch: (fileSize === downloadedSize)
+									retrievedSizeMatch: (fileSize === downloadedSize)
 								};
 
-								data.headers = res.headers.raw();
-								return resolve(data);
+								info.headers = res.headers.raw();
+								return resolve(info);
 							});
 							writer.on('error', reject);
 						});
@@ -99,4 +99,4 @@ function wget(url, action, options = {}) {
 	}
 }
 
-module.exports = wget;
+module.exports = exports = wget;

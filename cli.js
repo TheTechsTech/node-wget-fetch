@@ -74,8 +74,11 @@ if (
   if (args.url.length > 0) {
     console.log("Downloading...");
     wget(args.url, args.dest)
-      .then((done) => console.log('Done! The file ' + done.filepath + ' size' +
-        (done.transferSizeMatch ? '' : " DON'T" ) + ' match!'))
+      .then((done) => {
+        console.log('Done!');
+        console.log('The file ' + done.filepath + ' size' +
+          (done.transferSizeMatch ? '' : " DON'T") + ' match!');
+      })
       .catch((error) => {
         console.log('--- error:');
         console.log(error);

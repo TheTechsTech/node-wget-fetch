@@ -1,4 +1,4 @@
-var should = require('should'),
+const should = require('should'),
     fs = require('fs'),
     dst_dir = './test/tmp/',
     filename = 'angleman.png',
@@ -8,15 +8,15 @@ var should = require('should'),
     src_url = src_path + filename;
 
 
-describe('node-wget-js', function () {
+describe('node-wget-fetch', function () {
     describe('should', function () {
 
         it("load", function () {
-            var wget = require('../wget.js');
+            var wget = require('../wget-fetch.js');
             should.exist(wget);
         });
 
-        var wget = require('../wget.js');
+        var wget = require('../wget-fetch.js');
 
         it("return relative filepath: " + rel_path, function () {
             wget(rel_path, {
