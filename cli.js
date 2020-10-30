@@ -74,10 +74,10 @@ if (
   if (args.url.length > 0) {
     console.log("Downloading...");
     wget(args.url, args.dest)
-      .then((done) => {
+      .then((info) => {
         console.log('Done!');
-        console.log('The file ' + done.filepath + ' size' +
-          (done.transferSizeMatch ? '' : " DON'T") + ' match!');
+        console.log('The file ' + info.filepath + ' size' +
+          (info.retrievedSizeMatch ? '' : " don't") + ' match!');
       })
       .catch((error) => {
         console.log('--- error:');
