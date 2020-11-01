@@ -2,10 +2,9 @@
 
 [![NPM](https://nodei.co/npm/node-wget-fetch.png)](https://nodei.co/npm/node-wget-fetch/)
 
-[![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget/actions) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
+[![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget-fetch/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget-fetch/actions) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
 
-Ultra simple async retrieval of remote files over http or https by way of [node-fetch](https://www.npmjs.com/package/node-fetch).
-
+Ultra simple async retrieval of resources or remote files over http or https, an cli tool, and convenience wrapper of [node-fetch](https://www.npmjs.com/package/node-fetch).
 
 ## Install
 
@@ -13,36 +12,45 @@ Ultra simple async retrieval of remote files over http or https by way of [node-
 npm install node-wget-fetch
 ```
 
+### fetching(url, destination | responseType | options [, options])
+
+- `url` A string representing an absolute url
+- `options` Standard *Request/Fetch* [Options](https://www.npmjs.com/package/node-fetch#fetch-options) for the HTTP(S) request
+- Returns: **Promise** of Response
+
 ## Usage
 
 ```javascript
-const wget = require('node-wget-fetch');
+const fetching = require('node-wget-fetch');
 
-wget(url) // retrieve to current directory
+fetching.wget(url) // retrieve to current directory
     .then((info) => {});
     .catch((error) => {});
 
-wget(url, options) // optional: `Fetch` Options
+fetching.wget(url, { headers:  { Accept: '*/*' } }) // with optional `Fetch` options
     .then((info) => {});
     .catch((error) => {});
 
-wget(url, destination_folder_or_filename, options)  // optional: `Fetch` Options
+fetching.wget(url, destination_folder_or_filename, { timeout: 2000 } )  // with optional `Fetch` options
     .then((info) => {});
     .catch((error) => {});
 
 
-wget(url, responseAction, // *responseAction* can be:
-    //  'array' for arrayBuffer()
-    //  'buffer' for buffer()
-    //  'blob' for blob()
-    //  'json' for json()
-    //  'text' for text()
-    //  'converted' for textConverted()
-    //  'stream' for NodeJs.readableStream()
-    { options }  // optional: `Fetch` Options
+fetching(url, responseType, // *responseType* can be:
+    // 'header' for all response headers - raw()
+    // 'object' for the response object - no post/pre processing
+    // 'array' for arrayBuffer()
+    // 'buffer' for buffer()
+    // 'blob' for blob()
+    // 'json' for json()
+    // 'text' for text()
+    // 'converted' for textConverted()
+    // 'stream' for NodeJs.readableStream()
+    // default is 'download'
+    { headers: {Accept: '*/*' } }) // with optional `Fetch` options
     )
-    .then((responseBody) => {
-        // No file is retrieved/saved,
+    .then((processedResponse) => {
+        // No file is retrieved or saved,
         // an resolved `Fetch` response body of above type is returned
     });
     .catch((error) => {});
@@ -53,9 +61,9 @@ wget(url, responseAction, // *responseAction* can be:
 ```javascript
 const wget = require('node-wget-fetch');
 
-wget('https://raw.github.com/techno-express/node-wget/master/angleman.png'); // angleman.png saved to current folder
+wget('https://raw.github.com/techno-express/node-wget-fetch/master/angleman.png'); // angleman.png saved to current folder
 
-wget('https://raw.github.com/techno-express/node-wget/master/package.json',
+wget('https://raw.github.com/techno-express/node-wget-fetch/master/package.json',
     '/tmp/', // destination path or path with filename, default is ./
     { timeout: 2000 } // Any `Fetch` Options, this sets duration to wait for request in milliseconds, default 0
     )
@@ -114,11 +122,11 @@ $ fetch https://github.com/NodeOS/NodeOS/archive/master.zip -d path/to/here/
 
 ## License: MIT
 
-[david-url]: https://david-dm.org/techno-express/node-wget
-[david-image]: http://img.shields.io/david/techno-express/node-wget.svg
-[codeclimate-url]: https://codeclimate.com/github/techno-express/node-wget/maintainability
+[david-url]: https://david-dm.org/techno-express/node-wget-fetch
+[david-image]: http://img.shields.io/david/techno-express/node-wget-fetch.svg
+[codeclimate-url]: https://codeclimate.com/github/techno-express/node-wget-fetch/maintainability
 [codeclimate-image]: https://api.codeclimate.com/v1/badges/0d6a0bc69a8ea29c7de9/maintainability
-[coveralls-url]: https://coveralls.io/github/techno-express/node-wget
-[coveralls-image]: https://coveralls.io/repos/github/techno-express/node-wget/badge.svg
+[coveralls-url]: https://coveralls.io/github/techno-express/node-wget-fetch
+[coveralls-image]: https://coveralls.io/repos/github/techno-express/node-wget-fetch/badge.svg
 [npm-url]: https://www.npmjs.org/package/node-wget-fetch
 [npm-image]: http://img.shields.io/npm/v/node-wget-fetch.svg

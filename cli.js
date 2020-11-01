@@ -8,7 +8,7 @@
  * Dependencies.
  */
 
-var wget = require('./');
+var fetching = require('./');
 var pack = require('./package.json');
 
 /*
@@ -73,7 +73,7 @@ if (
   args.url = firstNonFlag(argv);
   if (args.url.length > 0) {
     console.log("Downloading...");
-    wget(args.url, args.dest)
+    fetching(args.url, args.dest)
       .then((info) => {
         console.log('Done!');
         console.log('The file ' + info.filepath + ' size' +
