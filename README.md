@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/node-wget-fetch.png)](https://nodei.co/npm/node-wget-fetch/)
 
-[![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget-fetch/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget-fetch/actions) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
+[![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget-fetch/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget-fetch/actions) [![codecov](https://codecov.io/gh/techno-express/node-wget-fetch/branch/master/graph/badge.svg?token=QJ7L9IN5Y5)](https://codecov.io/gh/techno-express/node-wget-fetch) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
 
 Ultra simple async retrieval of resources or remote files over http or https, an cli tool, and convenience wrapper of [node-fetch](https://www.npmjs.com/package/node-fetch).
 
