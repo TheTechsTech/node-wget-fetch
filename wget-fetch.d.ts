@@ -3,9 +3,21 @@
  *
  * @param {String} url Absolute url of source
  * @param {Mixed} action Save to `destination` or body `action` on `response type` or use for `options`
- * @param {Object} options Fetch/Request options
  *
- * @return {Promise} Promise of response type
+ * **response type** can be:
+ * - '`header`' for all response headers - **raw()**
+ * - '`object`' for the response object - **no post/pre processing**
+ * - '`array`' for **arrayBuffer()**
+ * - '`buffer`' for **buffer()**
+ * - '`blob`' for **blob()**
+ * - '`json`' for **json()**
+ * - '`text`' for **text()**
+ * - '`converted`' for **textConverted()**
+ * - '`stream`' for **NodeJs.readableStream()**
+ *
+ * **default is '`download`'**
+ * @param {Object} options Fetch/Request options
+ * @return {Promise} Promise of `response body` of above **type**
  */
 declare const fetching: {
     (url: string, action?: string | object, options?: object): Promise<any>;
@@ -119,18 +131,38 @@ declare const fetching: {
     /**
     Fetch the given `url` using the option `{method: 'head'}`.
     @param url - URL string.
+    @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
     @param options optional `Fetch` options.
-    @returns A promise response of headers.
+    @returns A promise response body of given response action type.
     */
-    head: (url: string, options?: object) => Promise<any>;
+    head: (url: string, responseType?: string, options?: object) => Promise<any>;
 
     /**
     Fetch the given `url` using the option `{method: 'options'}`.
     @param url - URL string.
+    @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
     @param options optional `Fetch` options.
-    @returns A promise response of headers.
+    @returns A promise response body of given response action type.
     */
-    options: (url: string, options?: object) => Promise<any>;
+    options: (url: string, responseType?: string, options?: object) => Promise<any>;
 };
 
 declare namespace fetching { };

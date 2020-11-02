@@ -8,7 +8,7 @@ const should = require('should'),
     src_path = 'https://github.com/techno-express/node-wget/raw/master/',
     src_url = src_path + filename;
 
-class Blob { };
+class Blob {};
 Object.defineProperty(Blob.prototype, Symbol.toStringTag, {
     value: 'Blob',
     writable: false,
@@ -142,18 +142,42 @@ describe('node-wget-fetch', function () {
             }).should.equal(false);
         });
 
-          it('should have fetching method helpers', function () {
-              (typeof fetching.wget).should.equal('function');
-              (typeof fetching.get).should.equal('function');
-              (typeof fetching.head).should.equal('function');
-              (typeof fetching.options).should.equal('function');
-              (typeof fetching.delete).should.equal('function');
-              (typeof fetching.post).should.equal('function');
-              (typeof fetching.put).should.equal('function');
-              (typeof fetching.patch).should.equal('function');
-              (typeof fetching.fetch).should.equal('function');
-              (typeof fetching.fetch.Headers).should.equal('function');
-          });
+        it('should have fetching method helpers', function () {
+            (typeof fetching.wget).should.equal('function');
+            (typeof fetching.get).should.equal('function');
+            (typeof fetching.head).should.equal('function');
+            (typeof fetching.options).should.equal('function');
+            (typeof fetching.delete).should.equal('function');
+            (typeof fetching.post).should.equal('function');
+            (typeof fetching.put).should.equal('function');
+            (typeof fetching.patch).should.equal('function');
+            (typeof fetching.fetch).should.equal('function');
+            (typeof fetching.fetch.Headers).should.equal('function');
+        });
+
+        it('should resolve into response action type OBJECT from GET method', function () {
+            fetching.get('https://httpbin.org/get', 'object').then(res => {
+                res.should.be.an.instanceof(fetching.fetch.Response);
+                res.headers.should.be.an.instanceof(fetching.fetch.Headers);
+                res.body.should.be.an.instanceof(Stream.Transform);
+                res.bodyUsed.should.be.false;
+                res.ok.should.be.true;
+                res.status.should.equal(200);
+                res.statusText.should.equal('OK');
+            });
+        });
+
+        it('should resolve into response action type OBJECT from HEAD method', function () {
+            fetching.head('https://httpbin.org/head', 'object').then(res => {
+                res.should.be.an.instanceof(fetching.fetch.Response);
+                res.headers.should.be.an.instanceof(fetching.fetch.Headers);
+                res.body.should.be.an.instanceof(Stream.Transform);
+                res.bodyUsed.should.be.false;
+                res.ok.should.be.true;
+                res.status.should.equal(404);
+                res.statusText.should.equal('NOT FOUND');
+            });
+        });
     });
 
 });

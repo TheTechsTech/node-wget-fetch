@@ -8,9 +8,21 @@ const fs = require('fs'),
  *
  * @param {String} url Absolute url of source
  * @param {Mixed} action Save to `destination` or body `action` on `response type` or use for `options`
- * @param {Object} options Fetch/Request options
  *
- * @return {Promise} Promise of response type
+ * **response type** can be:
+ * - '`header`' for all response headers - **raw()**
+ * - '`object`' for the response object - **no post/pre processing**
+ * - '`array`' for **arrayBuffer()**
+ * - '`buffer`' for **buffer()**
+ * - '`blob`' for **blob()**
+ * - '`json`' for **json()**
+ * - '`text`' for **text()**
+ * - '`converted`' for **textConverted()**
+ * - '`stream`' for **NodeJs.readableStream()**
+ *
+ * **default is '`download`'**
+ * @param {Object} options Fetch/Request options
+ * @return {Promise} Promise of `response body` of above **type**
  */
 function fetching(url, action = '', options = {}) {
 	let src = url,
@@ -260,7 +272,7 @@ function verbFuncBody(verb) {
 }
 
 /**
- * Fetch the given `url`
+ * Fetch the given `url` by created functions for methods of head, options, get
  *
  * @param url - URL string.
  * @param responseType Response action type:
@@ -274,28 +286,14 @@ function verbFuncBody(verb) {
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response body of given response action type.
- */
-function get(uri, responseType = 'text', options = {}) {
-	let params = options;
-	params.method = method;
-	params.action = responseType;
-	return fetching(uri, params);
-}
-
-/**
- * Fetch the given `url` by created functions for methods of head, options
- *
- * @param url - URL string.
- * @param options optional `Fetch` options.
  * @returns A promise response of headers.
  */
 function verbFunc(verb) {
 	let method = verb.toUpperCase();
-	return function (uri, options = {}) {
+	return function (uri, responseType = 'header', options = {}) {
 		let params = options;
+		params.action = responseType;
 		params.method = method;
-		params.action = 'header';
 		return fetching(uri, params);
 	}
 }
@@ -321,7 +319,7 @@ function wget(url, folderFilename = './', options = {}) {
 }
 
 fetching.wget = wget;
-fetching.get = get;
+fetching.get = verbFunc('get');
 fetching.head = verbFunc('head');
 fetching.options = verbFunc('options');
 fetching.post = verbFuncBody('post');

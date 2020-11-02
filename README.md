@@ -12,11 +12,27 @@ Ultra simple async retrieval of resources or remote files over http or https, an
 npm install node-wget-fetch
 ```
 
-### fetching(url, destination | responseType | options [, options])
+## Basic API
+
+**fetching**(`url`, *action* = `destination` | `response_body_type` | `options` [, `options`])
 
 - `url` A string representing an absolute url
+- `action` Save to **destination** or body action on **response type** or use for **options**
+
+  **response type** can be:
+  - '`header`' for all response headers - **raw()**
+  - '`object`' for the response object - **no post/pre processing**
+  - '`array`' for **arrayBuffer()**
+  - '`buffer`' for **buffer()**
+  - '`blob`' for **blob()**
+  - '`json`' for **json()**
+  - '`text`' for **text()**
+  - '`converted`' for **textConverted()**
+  - '`stream`' for **NodeJs.readableStream()**
+
+  **default is '`download`'**
 - `options` Standard *Request/Fetch* [Options](https://www.npmjs.com/package/node-fetch#fetch-options) for the HTTP(S) request
-- Returns: **Promise** of Response
+- Returns: **Promise** of `response body` of above **type**
 
 ## Usage
 
