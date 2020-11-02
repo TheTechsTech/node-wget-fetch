@@ -34,6 +34,28 @@ npm install node-wget-fetch
 - `options` Standard *Request/Fetch* [Options](https://www.npmjs.com/package/node-fetch#fetch-options) for the HTTP(S) request
 - Returns: **Promise** of `response body` of above **type**
 
+## Convenience Request Methods
+
+**fetching.get**(`url`, *action* = `response_body_type` | `options` [, `options`])
+
+**fetching.head**(`url`, *action* = `response_body_type` | `options` [, `options`])
+
+**fetching.options**(`url`, *action* = `response_body_type` | `options` [, `options`])
+
+### For simply submitting `body` data
+
+**fetching.post**(`url`, `body`, *action* = `response_body_type` | `options` [, `options`])
+
+**fetching.put**(`url`, `body`, *action* = `response_body_type` | `options` [, `options`])
+
+**fetching.patch**(`url`, `body`, *action* = `response_body_type` | `options` [, `options`])
+
+**fetching.delete**(`url`, `body`, *action* = `response_body_type` | `options` [, `options`])
+
+## Bring in or access [node-fetch](https://www.npmjs.com/package/node-fetch) directly
+
+**fetching.fetch**(`url` [, `options`])
+
 ## Usage
 
 ```javascript
