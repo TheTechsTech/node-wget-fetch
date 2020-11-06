@@ -318,15 +318,182 @@ function wget(url, folderFilename = './', options = {}) {
 	return fetching(url, folderFilename, params);
 }
 
+/**
+ * Retrieve remote file over http or http
+ *
+ * @param {String} url Absolute url of source
+ * @param {Mixed} folderFilename Save to destination or use for options
+ * @param {Object} options Fetch/Request options
+ *
+ * @return {Promise} `Promise` info of completed file transfer:
+ * - { filepath: string, fileSize: number, retrievedSizeMatch: boolean, headers: object}
+ */
 fetching.wget = wget;
+
+/**
+ * Fetch the given `url` by header `GET` method
+ *
+ * @param url - URL string.
+ * @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
+ * @param options optional `Fetch` options.
+ * @returns A promise response of headers.
+ */
 fetching.get = verbFunc('get');
+
+/**
+ * Fetch the given `url` by header `HEAD` method
+ *
+ * @param url - URL string.
+ * @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
+ * @param options optional `Fetch` options.
+ * @returns A promise response of headers.
+ */
 fetching.head = verbFunc('head');
+
+/**
+ * Fetch the given `url` by header `OPTIONS` method
+ *
+ * @param url - URL string.
+ * @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
+ * @param options optional `Fetch` options.
+ * @returns A promise response of headers.
+ */
 fetching.options = verbFunc('options');
+
+/**
+ * Fetch the given `url` by header `POST` method
+ *
+ * @param url - URL string.
+ * @param body - Data to send.
+ * @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
+ * @param options optional `Fetch` options.
+ * @returns A promise response body of given response action type.
+ */
 fetching.post = verbFuncBody('post');
+
+/**
+ * Fetch the given `url` by header `PUT` method
+ *
+ * @param url - URL string.
+ * @param body - Data to send.
+ * @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
+ * @param options optional `Fetch` options.
+ * @returns A promise response body of given response action type.
+ */
 fetching.put = verbFuncBody('put');
+
+/**
+ * Fetch the given `url` by header `PATCH` method
+ *
+ * @param url - URL string.
+ * @param body - Data to send.
+ * @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
+ * @param options optional `Fetch` options.
+ * @returns A promise response body of given response action type.
+ */
 fetching.patch = verbFuncBody('patch');
+
+/**
+ * Fetch the given `url` by header `DELETE` method
+ *
+ * @param url - URL string.
+ * @param body - Data to send.
+ * @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
+ * @param options optional `Fetch` options.
+ * @returns A promise response body of given response action type.
+ */
 fetching.del = verbFuncBody('delete');
+
+/**
+ * Fetch the given `url` by header `DELETE` method
+ *
+ * @param url - URL string.
+ * @param body - Data to send.
+ * @param responseType Response action type:
+    - 'header' for all response headers - raw()
+    - 'object' for the response object - no post/pre processing
+    - 'array' for arrayBuffer()
+    - 'buffer' for buffer()
+    - 'blob' for blob()
+    - 'json' for json()
+    - 'text' for text()
+    - 'converted' for textConverted()
+    - 'stream' for NodeJs.readableStream()
+ * @param options optional `Fetch` options.
+ * @returns A promise response body of given response action type.
+ */
 fetching['delete'] = verbFuncBody('delete');
+
+/**
+ * Fetch function
+ *
+ * @param   Mixed    url   Absolute url or Request instance
+ * @param   Object   opts  Fetch options
+ * @return  Promise
+ */
 fetching.fetch = fetch;
 
 module.exports = exports = fetching;

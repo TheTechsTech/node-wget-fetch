@@ -1,9 +1,8 @@
 {
   "name": "node-wget-fetch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ultra simple async retrieval of resources or remote files over http or https, an cli tool, and convenience wrapper of node-fetch.",
   "main": "wget-fetch.js",
-  "types": "wget-fetch.d.ts",
   "scripts": {
     "test": "mocha -R list test/*.js",
     "coverage": "npx nyc@latest --reporter json --reporter text mocha -R list test/*.js && codecov -f coverage/coverage-final.json"
