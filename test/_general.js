@@ -68,32 +68,32 @@ describe('node-wget-fetch', function () {
             should.exist(holdData.filepath);
             should.exist(holdData.fileSize);
             should.exist(holdData.headers);
-            holdData.retrievedSizeMatch.should.equal(true)
+            holdData.fileSizeMatch.should.equal(true)
         });
 
-        it('should validate Array', function () {
+        it('validate Array', function () {
             fetching.isArray([]).should.equal(true);
             fetching.isArray({
                 length: 5
             }).should.equal(false);
         });
 
-        it('should validate Buffer', function () {
+        it('validate Buffer', function () {
             fetching.isBuffer(Buffer.from('a')).should.equal(true);
             fetching.isBuffer(null).should.equal(false);
             fetching.isBuffer(undefined).should.equal(false);
         });
 
-        it('should validate ArrayBuffer', function () {
+        it('validate ArrayBuffer', function () {
             fetching.isArrayBuffer(new ArrayBuffer(2)).should.equal(true);
             fetching.isArrayBuffer({}).should.equal(false);
         });
 
-        it('should validate Blob', function () {
+        it('validate Blob', function () {
             fetching.isBlob(new Blob()).should.equal(true);
         });
 
-        it('should validate String', function () {
+        it('validate String', function () {
             fetching.isString('').should.equal(true);
             fetching.isString({
                 toString: function () {
@@ -102,47 +102,47 @@ describe('node-wget-fetch', function () {
             }).should.equal(false);
         });
 
-        it('should validate Number', function () {
+        it('validate Number', function () {
             fetching.isNumber(123).should.equal(true);
             fetching.isNumber('123').should.equal(false);
         });
 
-        it('should validate Undefined', function () {
+        it('validate Undefined', function () {
             fetching.isUndefined().should.equal(true);
             fetching.isUndefined(null).should.equal(false);
         });
 
-        it('should validate Object', function () {
+        it('validate Object', function () {
             fetching.isObject({}).should.equal(true);
             fetching.isObject([]).should.equal(true);
             fetching.isObject(null).should.equal(false);
         });
 
-        it('should validate plain Object', function () {
+        it('validate plain Object', function () {
             fetching.isPlainObject({}).should.equal(true);
             fetching.isPlainObject([]).should.equal(false);
             fetching.isPlainObject(null).should.equal(false);
             fetching.isPlainObject(Object.create({})).should.equal(false);
         });
 
-        it('should validate Date', function () {
+        it('validate Date', function () {
             fetching.isDate(new Date()).should.equal(true);
             fetching.isDate(Date.now()).should.equal(false);
         });
 
-        it('should validate Function', function () {
+        it('validate Function', function () {
             fetching.isFunction(function () {}).should.equal(true);
             fetching.isFunction('function').should.equal(false);
         });
 
-        it('should validate Stream', function () {
+        it('validate Stream', function () {
             fetching.isStream(new Stream.Readable()).should.equal(true);
             fetching.isStream({
                 foo: 'bar'
             }).should.equal(false);
         });
 
-        it('should have fetching method helpers', function () {
+        it('have fetching.xxxxx method helpers', function () {
             (typeof fetching.wget).should.equal('function');
             (typeof fetching.get).should.equal('function');
             (typeof fetching.head).should.equal('function');
@@ -155,7 +155,7 @@ describe('node-wget-fetch', function () {
             (typeof fetching.fetch.Headers).should.equal('function');
         });
 
-        it('should resolve into response action type OBJECT from GET method', function () {
+        it('resolve on response action of OBJECT from GET method', function () {
             fetching.get('https://httpbin.org/get', 'object').then(res => {
                 res.should.be.an.instanceof(fetching.fetch.Response);
                 res.headers.should.be.an.instanceof(fetching.fetch.Headers);
@@ -167,16 +167,42 @@ describe('node-wget-fetch', function () {
             });
         });
 
-        it('should resolve into response action type OBJECT from HEAD method', function () {
-            fetching.head('https://httpbin.org/head', 'object').then(res => {
-                res.should.be.an.instanceof(fetching.fetch.Response);
-                res.headers.should.be.an.instanceof(fetching.fetch.Headers);
-                res.body.should.be.an.instanceof(Stream.Transform);
-                res.bodyUsed.should.be.false;
-                res.ok.should.be.true;
-                res.status.should.equal(404);
-                res.statusText.should.equal('NOT FOUND');
+        it('resolve on response action of JSON from POST method', function () {
+            fetching.post('https://httpbin.org/post', 'json').then(res => {
+                fetching.isObject(res).should.be.true;
             });
+        });
+
+        it('resolve on response action of TEXT from PATCH method', function () {
+            fetching.patch('https://httpbin.org/patch', 'text').then(res => {
+                fetching.isString(res).should.be.true;
+            });
+        });
+
+        it('resolve on response action of BUFFER from PUT method', function () {
+            fetching.put('https://httpbin.org/put', 'buffer').then(res => {
+                fetching.isBuffer(res).should.be.true;
+            });
+        });
+
+        it('resolve on response action of BLOB from DELETE method', function () {
+            fetching.delete('https://httpbin.org/delete', 'blob').then(res => {
+                fetching.isBlob(res).should.be.true;
+            });
+        });
+
+        it('reject on Fetch to Url not accepting the HEAD method', function () {
+            fetching.head('https://httpbin.org/head')
+                .catch(err => {
+                    err.should.equal('Fetch to https://httpbin.org/head failed, with status text: NOT FOUND');
+                });
+        });
+
+        it('reject on Fetch to Url not accepting the OPTIONS method', function () {
+            fetching.options('https://httpbin.org/options')
+                .catch(err => {
+                    err.should.equal('Fetch to https://httpbin.org/options failed, with status text: NOT FOUND');
+                });
         });
     });
 

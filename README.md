@@ -32,7 +32,7 @@ npm install node-wget-fetch
 
   **default is '`download`'**
 - `options` Standard *Request/Fetch* [Options](https://www.npmjs.com/package/node-fetch#fetch-options) for the HTTP(S) request
-- Returns: **Promise** of `response body` of above **type**
+- Returns: **Promise** of `response body` of above **type**, only if **status text** is `OK`
 
 ## Convenience Request Methods
 
@@ -113,7 +113,7 @@ wget('https://raw.github.com/techno-express/node-wget-fetch/master/package.json'
         console.log('--- file size retrieved:');
         console.log(info.fileSize);
         console.log('--- Do file retrieved match "Content-Length"?:');
-        console.log(info.retrievedSizeMatch);
+        console.log(info.fileSizeMatch);
     })
     .catch((error) => {
         console.log('--- error:');

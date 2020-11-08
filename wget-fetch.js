@@ -61,57 +61,63 @@ function fetching(url, action = '', options = {}) {
 	} else {
 		return fetch(src, options)
 			.then(res => {
-				switch (action) {
-					case 'header':
-						return new Promise((resolve) => resolve(res.headers.raw()));
-					case 'object':
-						return new Promise((resolve) => resolve(res));
-					case 'array':
-						return res.arrayBuffer();
-					case 'buffer':
-						return res.buffer();
-					case 'blob':
-						return res.blob();
-					case 'json':
-						return res.json();
-					case 'text':
-						return res.text();
-					case 'converted':
-						return res.textConverted();
-					case 'stream':
-						return new Promise((resolve) => resolve(res.body));
-					default:
-						return new Promise((resolve, reject) => {
-							const fileSize = Number.isInteger(res.headers.get('content-length') - 0) ?
-								parseInt(res.headers.get('content-length')) :
-								0;
-							let downloadedSize = 0;
-							const writer = fs.createWriteStream(destination, {
-								flags: 'w+',
-								encoding: 'binary'
-							});
-							res.body.pipe(writer);
+				if (res.statusText === 'OK') {
+					switch (action) {
+						case 'header':
+							return new Promise((resolve) => resolve(res.headers.raw()));
+						case 'object':
+							return new Promise((resolve) => resolve(res));
+						case 'array':
+							return res.arrayBuffer();
+						case 'buffer':
+							return res.buffer();
+						case 'blob':
+							return res.blob();
+						case 'json':
+							return res.json();
+						case 'text':
+							return res.text();
+						case 'converted':
+							return res.textConverted();
+						case 'stream':
+							return new Promise((resolve) => resolve(res.body));
+						default:
+							return new Promise((resolve, reject) => {
+								const fileSize = Number.isInteger(res.headers.get('content-length') - 0) ?
+									parseInt(res.headers.get('content-length')) :
+									0;
+								let downloadedSize = 0;
+								const writer = fs.createWriteStream(destination, {
+									flags: 'w+',
+									encoding: 'binary'
+								});
+								res.body.pipe(writer);
 
-							res.body.on('data', function (chunk) {
-								downloadedSize += chunk.length;
-							});
+								res.body.on('data', function (chunk) {
+									downloadedSize += chunk.length;
+								});
 
-							writer.on('finish', () => {
-								writer.end();
-								let info = {
-									filepath: destination,
-									fileSize: downloadedSize,
-									retrievedSizeMatch: (fileSize === downloadedSize)
-								};
+								writer.on('finish', () => {
+									writer.end();
+									let info = {
+										filepath: destination,
+										fileSize: downloadedSize,
+										fileSizeMatch: (fileSize === downloadedSize)
+									};
 
-								info.headers = res.headers.raw();
-								return resolve(info);
+									info.headers = res.headers.raw();
+									return resolve(info);
+								});
+								writer.on('error', reject);
 							});
-							writer.on('error', reject);
-						});
+					}
+				} else {
+					throw ("Fetch to " + src + " failed, with status text: " + res.statusText);
 				}
 			})
-			.catch(err => console.log(err));
+			.catch(err => {
+				return new Promise((resolve, reject) => reject(err));
+			});
 	}
 }
 
