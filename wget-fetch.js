@@ -22,7 +22,7 @@ const fs = require('fs'),
  *
  * **default is '`download`'**
  * @param {Object} options Fetch/Request options
- * @return {Promise} Promise of `response body` of above **type**
+ * @return {Promise} Promise of `response body` of above **type**, only if **status text** is `OK`
  */
 function fetching(url, action = '', options = {}) {
 	let src = url,
@@ -264,11 +264,11 @@ function isStream(val) {
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response body of given response action type.
+ * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
 function verbFuncBody(verb) {
 	let method = verb.toUpperCase();
-	return function (uri, body, responseType = 'text', options = {}) {
+	return function (uri, body = null, responseType = 'text', options = {}) {
 		var params = options;
 		params.method = method;
 		params.action = responseType;
@@ -292,7 +292,7 @@ function verbFuncBody(verb) {
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response of headers.
+ * @returns A promise response of headers, only if **status text** is `OK`
  */
 function verbFunc(verb) {
 	let method = verb.toUpperCase();
@@ -311,8 +311,8 @@ function verbFunc(verb) {
  * @param {Mixed} folderFilename Save to destination or use for options
  * @param {Object} options Fetch/Request options
  *
- * @return {Promise} `Promise` info of completed file transfer:
- * - { filepath: string, fileSize: number, retrievedSizeMatch: boolean, headers: object}
+ * @return {Promise} `Promise` **info** of completed file transfer:
+ * - { filepath: string, fileSize: number, fileSizeMatch: boolean, headers: object}, only if **status text** is `OK`
  */
 function wget(url, folderFilename = './', options = {}) {
 	let params = options;
@@ -332,7 +332,7 @@ function wget(url, folderFilename = './', options = {}) {
  * @param {Object} options Fetch/Request options
  *
  * @return {Promise} `Promise` info of completed file transfer:
- * - { filepath: string, fileSize: number, retrievedSizeMatch: boolean, headers: object}
+ * - { filepath: string, fileSize: number, retrievedSizeMatch: boolean, headers: object}, only if **status text** is `OK`
  */
 fetching.wget = wget;
 
@@ -351,7 +351,7 @@ fetching.wget = wget;
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response of headers.
+ * @returns A promise response of headers, only if **status text** is `OK`
  */
 fetching.get = verbFunc('get');
 
@@ -370,7 +370,7 @@ fetching.get = verbFunc('get');
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response of headers.
+ * @returns A promise response of headers, only if **status text** is `OK`
  */
 fetching.head = verbFunc('head');
 
@@ -389,7 +389,7 @@ fetching.head = verbFunc('head');
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response of headers.
+ * @returns A promise response of headers, only if **status text** is `OK`
  */
 fetching.options = verbFunc('options');
 
@@ -409,7 +409,7 @@ fetching.options = verbFunc('options');
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response body of given response action type.
+ * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
 fetching.post = verbFuncBody('post');
 
@@ -429,7 +429,7 @@ fetching.post = verbFuncBody('post');
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response body of given response action type.
+ * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
 fetching.put = verbFuncBody('put');
 
@@ -449,7 +449,7 @@ fetching.put = verbFuncBody('put');
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response body of given response action type.
+ * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
 fetching.patch = verbFuncBody('patch');
 
@@ -469,7 +469,7 @@ fetching.patch = verbFuncBody('patch');
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response body of given response action type.
+ * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
 fetching.del = verbFuncBody('delete');
 
@@ -489,7 +489,7 @@ fetching.del = verbFuncBody('delete');
     - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
- * @returns A promise response body of given response action type.
+ * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
 fetching['delete'] = verbFuncBody('delete');
 
