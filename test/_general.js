@@ -168,25 +168,25 @@ describe('node-wget-fetch', function () {
         });
 
         it('resolve on response action of JSON from POST method', function () {
-            fetching.post('https://httpbin.org/post', 'json').then(res => {
+            fetching.post('https://httpbin.org/post', 'a=1', 'json').then(res => {
                 fetching.isObject(res).should.be.true;
             });
         });
 
         it('resolve on response action of TEXT from PATCH method', function () {
-            fetching.patch('https://httpbin.org/patch', 'text').then(res => {
+            fetching.patch('https://httpbin.org/patch', 'a=1', 'text').then(res => {
                 fetching.isString(res).should.be.true;
             });
         });
 
         it('resolve on response action of BUFFER from PUT method', function () {
-            fetching.put('https://httpbin.org/put', 'buffer').then(res => {
+            fetching.put('https://httpbin.org/put', 'a=1', 'buffer').then(res => {
                 fetching.isBuffer(res).should.be.true;
             });
         });
 
         it('resolve on response action of BLOB from DELETE method', function () {
-            fetching.delete('https://httpbin.org/delete', 'blob').then(res => {
+            fetching.delete('https://httpbin.org/delete', 'a=1', 'blob').then(res => {
                 fetching.isBlob(res).should.be.true;
             });
         });
