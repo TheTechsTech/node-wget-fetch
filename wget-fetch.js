@@ -3,6 +3,17 @@
 const fs = require('fs'),
 	fetch = require('node-fetch');
 
+let content_types = {};
+content_types['json'] = 'application/json; charset=utf-8';
+content_types['text'] = 'application/x-www-form-urlencoded';
+content_types['blob'] = 'application/octet';
+content_types['buffer'] = 'application/octet';
+content_types['header'] = 'text/plain';
+content_types['object'] = 'application/json; charset=utf-8';
+content_types['stream'] = 'application/octet';
+content_types['array'] = 'application/octet';
+content_types['converted'] = 'application/x-www-form-urlencoded';
+
 /**
  * Retrieval of resources or remote files over http or https by way of `node-fetch`
  *
@@ -269,9 +280,11 @@ function isStream(val) {
 function verbFuncBody(verb) {
 	let method = verb.toUpperCase();
 	return function (uri, body = null, responseType = 'text', options = {}) {
-		var params = options;
+		let params = { headers: { 'Content-Type': null}};
+		params = Object.assign(params, options);
 		params.method = method;
 		params.action = responseType;
+		params.headers['Content-Type'] = content_types[responseType] || 'application/x-www-form-urlencoded';
 		params.body = body;
 		return fetching(uri, params);
 	}
