@@ -51,7 +51,7 @@ describe('node-wget-fetch', function () {
         beforeEach(function (done) {
             this.timeout(15 * 60 * 1000); // give it 15 seconds instead of 2
 
-            fetching(src_url, dst_path)
+            fetching.wget(src_url, dst_path)
                 .then(data => {
                     holdData = data;
                     fs.unlinkSync(dst_path);
