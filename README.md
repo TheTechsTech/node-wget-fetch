@@ -34,6 +34,17 @@ npm install node-wget-fetch
 - `options` Standard *Request/Fetch* [Options](https://www.npmjs.com/package/node-fetch#fetch-options) for the HTTP(S) request
 - Returns: **Promise** of `response body` of above **type**, only if **status text** is `OK`
 
+- The **response type** will set _Fetch/Request_ **header** `'Content-Type'` as:
+  - '`json`' = 'application/json; charset=utf-8'
+  - '`text`' = 'application/x-www-form-urlencoded'
+  - '`blob`' = 'application/octet'
+  - '`buffer`' = 'application/octet'
+  - '`header`' = 'text/plain'
+  - '`object`' = 'application/json; charset=utf-8'
+  - '`stream`' = 'application/octet'
+  - '`array`' = 'application/octet'
+  - '`converted`' = 'application/x-www-form-urlencoded'
+
 ## Convenience Request Methods
 
 **fetching.get**(`url`, *action* = `response_body_type` | `options` [, `options`])
