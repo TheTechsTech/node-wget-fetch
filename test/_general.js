@@ -232,6 +232,15 @@ describe('node-wget-fetch', function () {
                     fetching.isString(res).should.be.true;
                 });
         });
+
+        it('resolve on file retrieval no destination set with OPTIONS parameter instead', function () {
+            fetching.wget('https://github.com/techno-express/node-wget-fetch/blob/master/test/tmp/Image.bmp',
+                { headers: { 'User-Agent': 'node-wget-fetch/1.0'}, compress: false, size: 1 })
+                .then(res => {
+                    fetching.isArray(res).should.be.true;
+                    fs.unlinkSync(res.filepath);
+                });
+        });
     });
 
 });

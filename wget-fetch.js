@@ -47,6 +47,7 @@ function fetching(url, action = '', options = {}) {
 
     if (isString(action) && ['header', 'object', 'array', 'buffer', 'blob', 'json', 'text', 'stream'].includes(action)) {
         destination = './';
+        options.action = action;
     } else if (isObject(action)) {
         options = Object.assign(options, action);
         destination = './';
@@ -91,9 +92,7 @@ function fetching(url, action = '', options = {}) {
                             return new Promise((resolve) => resolve(res.body));
                         default:
                             return new Promise((resolve, reject) => {
-                                const fileSize = Number.isInteger(res.headers.get('content-length') - 0)
-                                    ? parseInt(res.headers.get('content-length'))
-                                    : 0;
+                                const fileSize = parseInt(res.headers.get('content-length'));
                                 let downloadedSize = 0;
                                 const writer = fs.createWriteStream(destination, {
                                     flags: 'w+',
