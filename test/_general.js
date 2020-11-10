@@ -180,13 +180,13 @@ describe('node-wget-fetch', function () {
         });
 
         it('resolve on response action of BUFFER from PUT method', function () {
-            fetching.put('https://httpbin.org/put', 'a=1', 'buffer').then(res => {
+            fetching.put('https://httpbin.org/put', '', 'buffer').then(res => {
                 fetching.isBuffer(res).should.be.true;
             });
         });
 
         it('resolve on response action of BLOB from DELETE method', function () {
-            fetching.delete('https://httpbin.org/delete', 'a=1', 'blob').then(res => {
+            fetching.delete('https://httpbin.org/delete', 'a', 'blob').then(res => {
                 fetching.isBlob(res).should.be.true;
             });
         });
@@ -203,6 +203,19 @@ describe('node-wget-fetch', function () {
                 .catch(err => {
                     err.should.equal('Fetch to https://httpbin.org/options failed, with status text: NOT FOUND');
                 });
+        });
+
+        it('resolve on response action of HEADER from GET method', function () {
+            fetching.get('https://httpbin.org/get', 'header').then(res => {
+                fetching.isObject(res).should.be.true;
+                should.exist(res.connection);
+            });
+        });
+
+        it('resolve on response action of STREAM from POST method', function () {
+            fetching.post('https://httpbin.org/post', {stuff: 1} , 'stream').then(res => {
+                fetching.isStream(res).should.be.true;
+            });
         });
     });
 

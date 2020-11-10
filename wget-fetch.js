@@ -263,7 +263,8 @@ function isStream(val) {
 /**
  * Fetch the given `url` by created functions methods of patch, post, put, delete
  * @param url - URL string.
- * @param body - Data to send.
+ * @param body - Data to send
+ * - Note: `body` data is passed in, handled by **URLSearchParams** _class_, if `String` or `Object`.
  * @param responseType Response action type:
     - 'header' for all response headers - raw()
     - 'object' for the response object - no post/pre processing
@@ -280,12 +281,16 @@ function isStream(val) {
 function verbFuncBody(verb) {
 	let method = verb.toUpperCase();
 	return function (uri, body = null, responseType = 'text', options = {}) {
-		let params = { headers: { 'Content-Type': null}};
-		params = Object.assign(params, options);
+		let params = {
+			headers: {
+				'Content-Type': null
+			}
+		};
 		params.method = method;
 		params.action = responseType;
 		params.headers['Content-Type'] = content_types[responseType] || 'application/x-www-form-urlencoded';
-		params.body = body;
+		params.body = ((isString(body) && body.includes('=')) || (isObject(body))) ? new URLSearchParams(body) : body;
+		params = Object.assign(params, options);
 		return fetching(uri, params);
 	}
 }
@@ -411,6 +416,7 @@ fetching.options = verbFunc('options');
  *
  * @param url - URL string.
  * @param body - Data to send.
+ * - Note: `body` data is passed in, handled by **URLSearchParams** _class_, if `String` or `Object`.
  * @param responseType Response action type:
     - 'header' for all response headers - raw()
     - 'object' for the response object - no post/pre processing
@@ -431,6 +437,7 @@ fetching.post = verbFuncBody('post');
  *
  * @param url - URL string.
  * @param body - Data to send.
+ * - Note: `body` data is passed in, handled by **URLSearchParams** _class_, if `String` or `Object`.
  * @param responseType Response action type:
     - 'header' for all response headers - raw()
     - 'object' for the response object - no post/pre processing
@@ -451,6 +458,7 @@ fetching.put = verbFuncBody('put');
  *
  * @param url - URL string.
  * @param body - Data to send.
+ * - Note: `body` data is passed in, handled by **URLSearchParams** _class_, if `String` or `Object`.
  * @param responseType Response action type:
     - 'header' for all response headers - raw()
     - 'object' for the response object - no post/pre processing
@@ -471,6 +479,7 @@ fetching.patch = verbFuncBody('patch');
  *
  * @param url - URL string.
  * @param body - Data to send.
+ * - Note: `body` data is passed in, handled by **URLSearchParams** _class_, if `String` or `Object`.
  * @param responseType Response action type:
     - 'header' for all response headers - raw()
     - 'object' for the response object - no post/pre processing
@@ -491,6 +500,7 @@ fetching.del = verbFuncBody('delete');
  *
  * @param url - URL string.
  * @param body - Data to send.
+ * - Note: `body` data is passed in, handled by **URLSearchParams** _class_, if `String` or `Object`.
  * @param responseType Response action type:
     - 'header' for all response headers - raw()
     - 'object' for the response object - no post/pre processing

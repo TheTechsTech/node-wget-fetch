@@ -47,25 +47,27 @@ npm install node-wget-fetch
 
 ## Convenience Request Methods
 
-**fetching.get**(`url`, *action* = `response_body_type` | `options` [, `options`])
+**fetching.get**(`url`, `response_body_type` [, `options`]);
 
-**fetching.head**(`url`, *action* = `response_body_type` | `options` [, `options`])
+**fetching.head**(`url`, `response_body_type` [, `options`]);
 
-**fetching.options**(`url`, *action* = `response_body_type` | `options` [, `options`])
+**fetching.options**(`url`, `response_body_type` [, `options`);]
 
 ### For simply submitting `body` data
 
-**fetching.post**(`url`, `body`, *action* = `response_body_type` | `options` [, `options`])
+> Note: `body` data is passed in, handled by **URLSearchParams** _class_, if `String` or `Object`.
 
-**fetching.put**(`url`, `body`, *action* = `response_body_type` | `options` [, `options`])
+**fetching.post**(`url`, `body`, `response_body_type` [, `options`]);
 
-**fetching.patch**(`url`, `body`, *action* = `response_body_type` | `options` [, `options`])
+**fetching.put**(`url`, `body`, `response_body_type` [, `options`]);
 
-**fetching.delete**(`url`, `body`, *action* = `response_body_type` | `options` [, `options`])
+**fetching.patch**(`url`, `body`, `response_body_type` [, `options`]);
+
+**fetching.delete**(`url`, `body`, `response_body_type` [, `options`]);
 
 ## Bring in or access [node-fetch](https://www.npmjs.com/package/node-fetch) directly
 
-**fetching.fetch**(`url` [, `options`])
+**fetching.fetch**(`url` [, `options`]);
 
 ## Usage
 
