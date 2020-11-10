@@ -1,18 +1,18 @@
 'use strict';
 
 const fs = require('fs'),
-	fetch = require('node-fetch');
+    fetch = require('node-fetch');
 
-let content_types = {};
-content_types['json'] = 'application/json; charset=utf-8';
-content_types['text'] = 'application/x-www-form-urlencoded';
-content_types['blob'] = 'application/octet';
-content_types['buffer'] = 'application/octet';
-content_types['header'] = 'text/plain';
-content_types['object'] = 'application/json; charset=utf-8';
-content_types['stream'] = 'application/octet';
-content_types['array'] = 'application/octet';
-content_types['converted'] = 'application/x-www-form-urlencoded';
+let content_types = {
+    json: 'application/json; charset=utf-8',
+    text: 'application/x-www-form-urlencoded',
+    blob: 'application/octet',
+    buffer: 'application/octet',
+    header: 'text/plain',
+    object: 'application/json; charset=utf-8',
+    stream: 'application/octet',
+    array: 'application/octet'
+}
 
 /**
  * Retrieval of resources or remote files over http or https by way of `node-fetch`
@@ -28,7 +28,6 @@ content_types['converted'] = 'application/x-www-form-urlencoded';
  * - '`blob`' for **blob()**
  * - '`json`' for **json()**
  * - '`text`' for **text()**
- * - '`converted`' for **textConverted()**
  * - '`stream`' for **NodeJs.readableStream()**
  *
  * **default is '`download`'**
@@ -36,100 +35,98 @@ content_types['converted'] = 'application/x-www-form-urlencoded';
  * @return {Promise} Promise of `response body` of above **type**, only if **status text** is `OK`
  */
 function fetching(url, action = '', options = {}) {
-	let src = url,
-		destination = action || './',
-		parts = src.split('/'),
-		file = parts[parts.length - 1];
+    let src = url,
+        destination = action || './',
+        parts = src.split('/'),
+        file = parts[parts.length - 1];
 
-	parts = file.split('?');
-	file = parts[0];
-	parts = file.split('#');
-	file = parts[0];
+    parts = file.split('?');
+    file = parts[0];
+    parts = file.split('#');
+    file = parts[0];
 
-	if (isString(action) && ['header', 'object', 'array', 'buffer', 'blob', 'json', 'text', 'converted', 'stream'].includes(action)) {
-		destination = './';
-	} else if (isObject(action)) {
-		options = Object.assign(options, action);
-		destination = './';
-		action = 'stream';
-	} else {
-		action = 'download';
-	}
+    if (isString(action) && ['header', 'object', 'array', 'buffer', 'blob', 'json', 'text', 'stream'].includes(action)) {
+        destination = './';
+    } else if (isObject(action)) {
+        options = Object.assign(options, action);
+        destination = './';
+        action = 'stream';
+    } else {
+        action = 'download';
+    }
 
-	if (options.action) {
-		action = options.action;
-		delete options.action;
-	}
+    if (options.action) {
+        action = options.action;
+        delete options.action;
+    }
 
-	if (destination.substr(destination.length - 1, 1) == '/') {
-		destination = destination + file;
-	}
+    if (destination.substr(destination.length - 1, 1) == '/') {
+        destination = destination + file;
+    }
 
-	if (options.dry) {
-		return new Promise((resolve) => resolve({
-			filepath: destination
-		}));
-	} else {
-		return fetch(src, options)
-			.then(res => {
-				if (res.statusText === 'OK') {
-					switch (action) {
-						case 'header':
-							return new Promise((resolve) => resolve(res.headers.raw()));
-						case 'object':
-							return new Promise((resolve) => resolve(res));
-						case 'array':
-							return res.arrayBuffer();
-						case 'buffer':
-							return res.buffer();
-						case 'blob':
-							return res.blob();
-						case 'json':
-							return res.json();
-						case 'text':
-							return res.text();
-						case 'converted':
-							return res.textConverted();
-						case 'stream':
-							return new Promise((resolve) => resolve(res.body));
-						default:
-							return new Promise((resolve, reject) => {
-								const fileSize = Number.isInteger(res.headers.get('content-length') - 0) ?
-									parseInt(res.headers.get('content-length')) :
-									0;
-								let downloadedSize = 0;
-								const writer = fs.createWriteStream(destination, {
-									flags: 'w+',
-									encoding: 'binary'
-								});
-								res.body.pipe(writer);
+    if (options.dry) {
+        return new Promise((resolve) => resolve({
+            filepath: destination
+        }));
+    } else {
+        return fetch(src, options)
+            .then(res => {
+                if (res.statusText === 'OK' || res.ok) {
+                    switch (action) {
+                        case 'header':
+                            return new Promise((resolve) => resolve(res.headers.raw()));
+                        case 'object':
+                            return new Promise((resolve) => resolve(res));
+                        case 'array':
+                            return res.arrayBuffer();
+                        case 'buffer':
+                            return res.buffer();
+                        case 'blob':
+                            return res.blob();
+                        case 'json':
+                            return res.json();
+                        case 'text':
+                            return res.text();
+                        case 'stream':
+                            return new Promise((resolve) => resolve(res.body));
+                        default:
+                            return new Promise((resolve, reject) => {
+                                const fileSize = Number.isInteger(res.headers.get('content-length') - 0)
+                                    ? parseInt(res.headers.get('content-length'))
+                                    : 0;
+                                let downloadedSize = 0;
+                                const writer = fs.createWriteStream(destination, {
+                                    flags: 'w+',
+                                    encoding: 'binary'
+                                });
+                                res.body.pipe(writer);
 
-								res.body.on('data', function (chunk) {
-									downloadedSize += chunk.length;
-								});
+                                res.body.on('data', function (chunk) {
+                                    downloadedSize += chunk.length;
+                                });
 
-								writer.on('finish', () => {
-									writer.end();
-									let info = {
-										filepath: destination,
-										fileSize: downloadedSize,
-										fileSizeMatch: (fileSize === downloadedSize)
-									};
+                                writer.on('finish', () => {
+                                    writer.end();
+                                    let info = {
+                                        filepath: destination,
+                                        fileSize: downloadedSize,
+                                        fileSizeMatch: (fileSize === downloadedSize)
+                                    };
 
-									info.headers = res.headers.raw();
-									return resolve(info);
-								});
-								writer.on('error', reject);
-							});
-					}
-				} else {
-					throw ("Fetch to " + src + " failed, with status text: " + res.statusText);
-				}
-			})
-			.catch(err => {
-				return new Promise((resolve, reject) => reject(err));
-			});
-	}
+                                    info.headers = res.headers.raw();
+                                    return resolve(info);
+                                });
+                                writer.on('error', reject);
+                            });
+                    }
+                } else {
+                    throw ("Fetch to " + src + " failed, with status text: " + res.statusText);
+                }
+            })
+            .catch(err => {
+                return new Promise((resolve, reject) => reject(err));
+            });
+    }
 }
 
 var toString = Object.prototype.toString;
@@ -141,7 +138,7 @@ var toString = Object.prototype.toString;
  * @returns {boolean} True if value is an Array, otherwise false
  */
 function isArray(val) {
-	return toString.call(val) === '[object Array]';
+    return toString.call(val) === '[object Array]';
 }
 
 /**
@@ -151,7 +148,7 @@ function isArray(val) {
  * @returns {boolean} True if the value is undefined, otherwise false
  */
 function isUndefined(val) {
-	return typeof val === 'undefined';
+    return typeof val === 'undefined';
 }
 
 /**
@@ -161,8 +158,8 @@ function isUndefined(val) {
  * @returns {boolean} True if value is a Buffer, otherwise false
  */
 function isBuffer(val) {
-	return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor) &&
-		typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
+    return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor) &&
+        typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
 }
 
 /**
@@ -172,7 +169,7 @@ function isBuffer(val) {
  * @returns {boolean} True if value is an ArrayBuffer, otherwise false
  */
 function isArrayBuffer(val) {
-	return toString.call(val) === '[object ArrayBuffer]';
+    return toString.call(val) === '[object ArrayBuffer]';
 }
 
 /**
@@ -182,7 +179,7 @@ function isArrayBuffer(val) {
  * @returns {boolean} True if value is a String, otherwise false
  */
 function isString(val) {
-	return typeof val === 'string';
+    return typeof val === 'string';
 }
 
 /**
@@ -192,7 +189,7 @@ function isString(val) {
  * @returns {boolean} True if value is a Number, otherwise false
  */
 function isNumber(val) {
-	return typeof val === 'number';
+    return typeof val === 'number';
 }
 
 /**
@@ -202,7 +199,7 @@ function isNumber(val) {
  * @returns {boolean} True if value is an Object, otherwise false
  */
 function isObject(val) {
-	return val !== null && typeof val === 'object';
+    return val !== null && typeof val === 'object';
 }
 
 /**
@@ -212,12 +209,12 @@ function isObject(val) {
  * @return {boolean} True if value is a plain Object, otherwise false
  */
 function isPlainObject(val) {
-	if (toString.call(val) !== '[object Object]') {
-		return false;
-	}
+    if (toString.call(val) !== '[object Object]') {
+        return false;
+    }
 
-	var prototype = Object.getPrototypeOf(val);
-	return prototype === null || prototype === Object.prototype;
+    var prototype = Object.getPrototypeOf(val);
+    return prototype === null || prototype === Object.prototype;
 }
 
 /**
@@ -227,7 +224,7 @@ function isPlainObject(val) {
  * @returns {boolean} True if value is a Blob, otherwise false
  */
 function isBlob(val) {
-	return toString.call(val) === '[object Blob]';
+    return toString.call(val) === '[object Blob]';
 }
 
 /**
@@ -237,7 +234,7 @@ function isBlob(val) {
  * @returns {boolean} True if value is a Function, otherwise false
  */
 function isFunction(val) {
-	return toString.call(val) === '[object Function]';
+    return toString.call(val) === '[object Function]';
 }
 
 /**
@@ -247,7 +244,7 @@ function isFunction(val) {
  * @returns {boolean} True if value is a Date, otherwise false
  */
 function isDate(val) {
-	return toString.call(val) === '[object Date]';
+    return toString.call(val) === '[object Date]';
 }
 
 /**
@@ -257,7 +254,7 @@ function isDate(val) {
  * @returns {boolean} True if value is a Stream, otherwise false
  */
 function isStream(val) {
-	return isObject(val) && isFunction(val.pipe);
+    return isObject(val) && isFunction(val.pipe);
 }
 
 /**
@@ -273,26 +270,25 @@ function isStream(val) {
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
 function verbFuncBody(verb) {
-	let method = verb.toUpperCase();
-	return function (uri, body = null, responseType = 'text', options = {}) {
-		let params = {
-			headers: {
-				'Content-Type': null
-			}
-		};
-		params.method = method;
-		params.action = responseType;
-		params.headers['Content-Type'] = content_types[responseType] || 'application/x-www-form-urlencoded';
-		params.body = ((isString(body) && body.includes('=')) || (isObject(body))) ? new URLSearchParams(body) : body;
-		params = Object.assign(params, options);
-		return fetching(uri, params);
-	}
+    let method = verb.toUpperCase();
+    return function (uri, body = null, responseType = 'text', options = {}) {
+        let params = {
+            headers: {
+                'Content-Type': null
+            }
+        };
+        params.method = method;
+        params.action = responseType;
+        params.headers['Content-Type'] = content_types[responseType] || 'application/x-www-form-urlencoded';
+        params.body = ((isString(body) && body.includes('=', '&')) || (isObject(body))) ? new URLSearchParams(body) : body;
+        params = Object.assign(params, options);
+        return fetching(uri, params);
+    }
 }
 
 /**
@@ -307,19 +303,18 @@ function verbFuncBody(verb) {
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response of headers, only if **status text** is `OK`
  */
 function verbFunc(verb) {
-	let method = verb.toUpperCase();
-	return function (uri, responseType = 'header', options = {}) {
-		let params = options;
-		params.action = responseType;
-		params.method = method;
-		return fetching(uri, params);
-	}
+    let method = verb.toUpperCase();
+    return function (uri, responseType = 'header', options = {}) {
+        let params = options;
+        params.action = responseType;
+        params.method = method;
+        return fetching(uri, params);
+    }
 }
 
 /**
@@ -333,13 +328,13 @@ function verbFunc(verb) {
  * - { filepath: string, fileSize: number, fileSizeMatch: boolean, headers: object}, only if **status text** is `OK`
  */
 function wget(url, folderFilename = './', options = {}) {
-	let params = options;
-	if (isObject(folderFilename)) {
-		params = Object.assign(params, folderFilename);
-		folderFilename = './';
-	}
-	params.action = 'download';
-	return fetching(url, folderFilename, params);
+    let params = options;
+    if (isObject(folderFilename)) {
+        params = Object.assign(params, folderFilename);
+        folderFilename = './';
+    }
+    params.action = 'download';
+    return fetching(url, folderFilename, params);
 }
 
 /**
@@ -366,7 +361,6 @@ fetching.wget = wget;
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response of headers, only if **status text** is `OK`
@@ -385,7 +379,6 @@ fetching.get = verbFunc('get');
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response of headers, only if **status text** is `OK`
@@ -404,7 +397,6 @@ fetching.head = verbFunc('head');
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response of headers, only if **status text** is `OK`
@@ -425,7 +417,6 @@ fetching.options = verbFunc('options');
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
@@ -446,7 +437,6 @@ fetching.post = verbFuncBody('post');
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
@@ -467,7 +457,6 @@ fetching.put = verbFuncBody('put');
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
@@ -488,7 +477,6 @@ fetching.patch = verbFuncBody('patch');
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
@@ -509,7 +497,6 @@ fetching.del = verbFuncBody('delete');
     - 'blob' for blob()
     - 'json' for json()
     - 'text' for text()
-    - 'converted' for textConverted()
     - 'stream' for NodeJs.readableStream()
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
@@ -527,7 +514,7 @@ fetching.fetch = fetch;
 
 module.exports = exports = fetching;
 Object.defineProperty(exports, "__esModule", {
-	value: true
+    value: true
 });
 
 exports.default = exports;

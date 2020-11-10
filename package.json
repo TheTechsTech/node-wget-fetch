@@ -1,6 +1,6 @@
 {
   "name": "node-wget-fetch",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Ultra simple async retrieval of resources or remote files over http or https, an cli tool, and convenience wrapper of node-fetch.",
   "main": "wget-fetch.js",
   "scripts": {

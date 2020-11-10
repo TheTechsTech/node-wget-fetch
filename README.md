@@ -27,7 +27,6 @@ npm install node-wget-fetch
   - '`blob`' for **blob()**
   - '`json`' for **json()**
   - '`text`' for **text()**
-  - '`converted`' for **textConverted()**
   - '`stream`' for **NodeJs.readableStream()**
 
   **default is '`download`'**
@@ -43,7 +42,6 @@ npm install node-wget-fetch
   - '`object`' = 'application/json; charset=utf-8'
   - '`stream`' = 'application/octet'
   - '`array`' = 'application/octet'
-  - '`converted`' = 'application/x-www-form-urlencoded'
 
 ## Convenience Request Methods
 
@@ -95,7 +93,6 @@ fetching(url, responseType, // *responseType* can be:
     // 'blob' for blob()
     // 'json' for json()
     // 'text' for text()
-    // 'converted' for textConverted()
     // 'stream' for NodeJs.readableStream()
     // default is 'download'
     { headers: {Accept: '*/*' } }) // with optional `Fetch` options

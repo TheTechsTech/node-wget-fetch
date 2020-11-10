@@ -8,7 +8,7 @@ const should = require('should'),
     src_path = 'https://github.com/techno-express/node-wget/raw/master/',
     src_url = src_path + filename;
 
-class Blob {};
+class Blob { };
 Object.defineProperty(Blob.prototype, Symbol.toStringTag, {
     value: 'Blob',
     writable: false,
@@ -131,7 +131,7 @@ describe('node-wget-fetch', function () {
         });
 
         it('validate Function', function () {
-            fetching.isFunction(function () {}).should.equal(true);
+            fetching.isFunction(function () { }).should.equal(true);
             fetching.isFunction('function').should.equal(false);
         });
 
@@ -213,9 +213,24 @@ describe('node-wget-fetch', function () {
         });
 
         it('resolve on response action of STREAM from POST method', function () {
-            fetching.post('https://httpbin.org/post', {stuff: 1} , 'stream').then(res => {
+            fetching.post('https://httpbin.org/post', { stuff: 1 }, 'stream').then(res => {
                 fetching.isStream(res).should.be.true;
             });
+        });
+
+        it('resolve on response action of ARRAY from PUT method and BODY as OBJECT', function () {
+            fetching.put('https://httpbin.org/put', { stuff: 2 }, 'array').then(res => {
+                fetching.isArrayBuffer(res).should.be.true;
+            });
+        });
+
+        it('resolve on response action of TEXT from PATCH method in OPTIONS parameter', function () {
+            fetching('https://httpbin.org/patch',
+                'text',
+                { method: 'PATCH', body: new URLSearchParams('stuff=3') })
+                .then(res => {
+                    fetching.isString(res).should.be.true;
+                });
         });
     });
 
