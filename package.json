@@ -1,11 +1,12 @@
 {
   "name": "node-wget-fetch",
-  "version": "1.0.6",
-  "description": "Ultra simple async retrieval of resources or remote files over http or https, an cli tool, and convenience wrapper of node-fetch.",
+  "version": "1.1.0",
+  "description": "Ultra simple async retrieval of resources or remote files over http or https, an cli tool, and convenience wrapper of node-fetch, and a seamless retry ability",
+  "type": "module",
   "main": "wget-fetch.js",
   "scripts": {
     "test": "mocha -R list test/*.js",
-    "coverage": "npx nyc@latest --reporter json --reporter text mocha -R list test/*.js && codecov -f coverage/coverage-final.json"
+    "coverage": "npx c8 --reporter json --reporter text npm test && npx codecov -f coverage/coverage-final.json"
   },
   "repository": {
     "type": "git",
@@ -37,7 +38,7 @@
     "fetch": "cli.js"
   },
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=12.0.0"
   },
   "files": [
     "cli.js",
@@ -48,8 +49,7 @@
     "node-fetch": "~2.6.1"
   },
   "devDependencies": {
-    "codecov": "^3.8.0",
-    "mocha": "^7.2.0",
+    "mocha": "^8.2.1",
     "should": "~13.2.3"
   }
 }

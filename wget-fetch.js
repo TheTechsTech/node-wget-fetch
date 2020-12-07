@@ -1,7 +1,9 @@
 'use strict';
 
-const fs = require('fs'),
-    fetch = require('node-fetch');
+import {
+    createWriteStream
+} from 'fs';
+import fetch from 'node-fetch';
 
 let content_types = {
     json: 'application/json; charset=utf-8',
@@ -12,6 +14,86 @@ let content_types = {
     object: 'application/json; charset=utf-8',
     stream: 'application/octet',
     array: 'application/octet'
+}
+
+/**
+ * Returns a promise that conditionally tries to resolve multiple times,
+ * as specified by the policy.
+ *
+ * @param {object} options - Either An object that specifies the retry policy.
+ * An object that specifies the retry policy.
+ *
+ * ```
+ * retry:
+ * {
+ *  retries: `1` - The maximum amount of times to retry the operation.
+ *  factor: `2` - The exponential factor to use.
+ *  minTimeout: `1000` - The number of milliseconds before starting the first retry.
+ *  maxTimeout: `Infinity` - The maximum number of milliseconds between two retries.
+ *  randomize: `false` - Randomizes the timeouts by multiplying with a factor between 1 to 2.
+ * }
+ * ```
+ * @param {function} executor - A function that is called for each attempt to resolve the promise.
+ * Executor function called as `(resolveFn, retryFn, rejectFn)`;
+ *  - `resolveFn` - To be called when the promise resolves normally.
+ *  - `retryFn` - To be called when the promise failed and a retry may be attempted.
+ *  - `rejectFn` - To be called when the promise failed and no retry should be attempted.
+ *
+ * @returns {Promise}
+ */
+export const retryPromise = fetching.retryPromise = function (options, executor) {
+    if (executor == undefined) {
+        executor = options;
+        options = {};
+    }
+
+    /*
+     * Preps the options object, initializing default values and checking constraints.
+     */
+    let opts = {
+        retries: 1,
+        factor: 2,
+        minTimeout: 1000,
+        maxTimeout: Infinity,
+        randomize: false
+    };
+
+    for (let key in options) {
+        opts[key] = options[key];
+    }
+
+    if (opts.minTimeout > opts.maxTimeout) {
+        throw new Error('minTimeout is greater than maxTimeout');
+    }
+
+    var attempts = 1;
+
+    return new Promise((resolve, reject) => {
+        let retrying = false;
+
+        function retry(err) {
+            if (retrying) return;
+            retrying = true;
+
+            /**
+             * Get a timeout value in milliseconds.
+             */
+            let random = opts.randomize ? Math.random() + 1 : 1;
+            let timeout = Math.round(random * opts.minTimeout * Math.pow(opts.factor, attempts));
+            timeout = Math.min(timeout, opts.maxTimeout);
+            if (attempts < opts.retries) {
+                setTimeout(() => {
+                    attempts++;
+                    retrying = false;
+                    executor(resolve, retry, reject, attempts);
+                }, timeout);
+            } else {
+                reject(err);
+            }
+        }
+
+        executor(resolve, retry, reject, attempts);
+    });
 }
 
 /**
@@ -61,6 +143,12 @@ function fetching(url, action = '', options = {}) {
         delete options.action;
     }
 
+    let retryPolicy = {};
+    if (options.retry) {
+        retryPolicy = options.retry;
+        delete options.retry;
+    }
+
     if (destination.substr(destination.length - 1, 1) == '/') {
         destination = destination + file;
     }
@@ -70,37 +158,37 @@ function fetching(url, action = '', options = {}) {
             filepath: destination
         }));
     } else {
-        return fetch(src, options)
-            .then(res => {
-                if (res.statusText === 'OK' || res.ok) {
-                    switch (action) {
-                        case 'header':
-                            return new Promise((resolve) => resolve(res.headers.raw()));
-                        case 'object':
-                            return new Promise((resolve) => resolve(res));
-                        case 'array':
-                            return res.arrayBuffer();
-                        case 'buffer':
-                            return res.buffer();
-                        case 'blob':
-                            return res.blob();
-                        case 'json':
-                            return res.json();
-                        case 'text':
-                            return res.text();
-                        case 'stream':
-                            return new Promise((resolve) => resolve(res.body));
-                        default:
-                            return new Promise((resolve, reject) => {
+        return new retryPromise(retryPolicy, (resolve, retry) => {
+            fetch(src, options)
+                .then(res => {
+                    if (res.statusText === 'OK' || res.ok) {
+                        switch (action) {
+                            case 'header':
+                                return resolve(res.headers.raw());
+                            case 'object':
+                                return resolve(res);
+                            case 'array':
+                                return resolve(res.arrayBuffer());
+                            case 'buffer':
+                                return resolve(res.buffer());
+                            case 'blob':
+                                return resolve(res.blob());
+                            case 'json':
+                                return resolve(res.json());
+                            case 'text':
+                                return resolve(res.text());
+                            case 'stream':
+                                return resolve(res.body);
+                            default:
                                 const fileSize = parseInt(res.headers.get('content-length'));
                                 let downloadedSize = 0;
-                                const writer = fs.createWriteStream(destination, {
+                                const writer = createWriteStream(destination, {
                                     flags: 'w+',
                                     encoding: 'binary'
                                 });
                                 res.body.pipe(writer);
 
-                                res.body.on('data', function (chunk) {
+                                res.body.on('data', (chunk) => {
                                     downloadedSize += chunk.length;
                                 });
 
@@ -111,20 +199,22 @@ function fetching(url, action = '', options = {}) {
                                         fileSize: downloadedSize,
                                         fileSizeMatch: (fileSize === downloadedSize)
                                     };
-
                                     info.headers = res.headers.raw();
                                     return resolve(info);
                                 });
-                                writer.on('error', reject);
-                            });
+                                writer.on('error', (err) => {
+                                    writer.end();
+                                    return retry(err);
+                                });
+                        }
+                    } else {
+                        throw ("Fetch to " + src + " failed, with status text: " + res.statusText);
                     }
-                } else {
-                    throw ("Fetch to " + src + " failed, with status text: " + res.statusText);
-                }
-            })
-            .catch(err => {
-                return new Promise((resolve, reject) => reject(err));
-            });
+                })
+                .catch((err) => retry(err));
+        }).catch((err) => {
+            return new Promise((resolve, reject) => reject(err));
+        });
     }
 }
 
@@ -136,7 +226,7 @@ var toString = Object.prototype.toString;
  * @param {Object} val The value to test
  * @returns {boolean} True if value is an Array, otherwise false
  */
-function isArray(val) {
+export const isArray = fetching.isArray = function (val) {
     return toString.call(val) === '[object Array]';
 }
 
@@ -146,7 +236,7 @@ function isArray(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if the value is undefined, otherwise false
  */
-function isUndefined(val) {
+export const isUndefined = fetching.isUndefined = function (val) {
     return typeof val === 'undefined';
 }
 
@@ -156,7 +246,7 @@ function isUndefined(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a Buffer, otherwise false
  */
-function isBuffer(val) {
+export const isBuffer = fetching.isBuffer = function (val) {
     return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor) &&
         typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
 }
@@ -167,7 +257,7 @@ function isBuffer(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is an ArrayBuffer, otherwise false
  */
-function isArrayBuffer(val) {
+export const isArrayBuffer = fetching.isArrayBuffer = function (val) {
     return toString.call(val) === '[object ArrayBuffer]';
 }
 
@@ -177,7 +267,7 @@ function isArrayBuffer(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a String, otherwise false
  */
-function isString(val) {
+export const isString = fetching.isString = function (val) {
     return typeof val === 'string';
 }
 
@@ -187,7 +277,7 @@ function isString(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a Number, otherwise false
  */
-function isNumber(val) {
+export const isNumber = fetching.isNumber = function (val) {
     return typeof val === 'number';
 }
 
@@ -197,7 +287,7 @@ function isNumber(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is an Object, otherwise false
  */
-function isObject(val) {
+export const isObject = fetching.isObject = function (val) {
     return val !== null && typeof val === 'object';
 }
 
@@ -207,7 +297,7 @@ function isObject(val) {
  * @param {Object} val The value to test
  * @return {boolean} True if value is a plain Object, otherwise false
  */
-function isPlainObject(val) {
+export const isPlainObject = fetching.isPlainObject = function (val) {
     if (toString.call(val) !== '[object Object]') {
         return false;
     }
@@ -222,7 +312,7 @@ function isPlainObject(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a Blob, otherwise false
  */
-function isBlob(val) {
+export const isBlob = fetching.isBlob = function (val) {
     return toString.call(val) === '[object Blob]';
 }
 
@@ -232,7 +322,7 @@ function isBlob(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a Function, otherwise false
  */
-function isFunction(val) {
+export const isFunction = fetching.isFunction = function (val) {
     return toString.call(val) === '[object Function]';
 }
 
@@ -242,7 +332,7 @@ function isFunction(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a Date, otherwise false
  */
-function isDate(val) {
+export const isDate = fetching.isDate = function (val) {
     return toString.call(val) === '[object Date]';
 }
 
@@ -252,7 +342,7 @@ function isDate(val) {
  * @param {Object} val The value to test
  * @returns {boolean} True if value is a Stream, otherwise false
  */
-function isStream(val) {
+export const isStream = fetching.isStream = function (val) {
     return isObject(val) && isFunction(val.pipe);
 }
 
@@ -326,7 +416,7 @@ function verbFunc(verb) {
  * @return {Promise} `Promise` **info** of completed file transfer:
  * - { filepath: string, fileSize: number, fileSizeMatch: boolean, headers: object}, only if **status text** is `OK`
  */
-function wget(url, folderFilename = './', options = {}) {
+function _wget(url, folderFilename = './', options = {}) {
     let params = options;
     if (isObject(folderFilename)) {
         params = Object.assign(params, folderFilename);
@@ -346,7 +436,7 @@ function wget(url, folderFilename = './', options = {}) {
  * @return {Promise} `Promise` info of completed file transfer:
  * - { filepath: string, fileSize: number, retrievedSizeMatch: boolean, headers: object}, only if **status text** is `OK`
  */
-fetching.wget = wget;
+export const wget = fetching.wget = _wget;
 
 /**
  * Fetch the given `url` by header `GET` method
@@ -364,7 +454,7 @@ fetching.wget = wget;
  * @param options optional `Fetch` options.
  * @returns A promise response of headers, only if **status text** is `OK`
  */
-fetching.get = verbFunc('get');
+export const get = fetching.get = verbFunc('get');
 
 /**
  * Fetch the given `url` by header `HEAD` method
@@ -382,7 +472,7 @@ fetching.get = verbFunc('get');
  * @param options optional `Fetch` options.
  * @returns A promise response of headers, only if **status text** is `OK`
  */
-fetching.head = verbFunc('head');
+export const head = fetching.head = verbFunc('head');
 
 /**
  * Fetch the given `url` by header `OPTIONS` method
@@ -400,7 +490,7 @@ fetching.head = verbFunc('head');
  * @param options optional `Fetch` options.
  * @returns A promise response of headers, only if **status text** is `OK`
  */
-fetching.options = verbFunc('options');
+export const options = fetching.options = verbFunc('options');
 
 /**
  * Fetch the given `url` by header `POST` method
@@ -420,7 +510,7 @@ fetching.options = verbFunc('options');
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
-fetching.post = verbFuncBody('post');
+export const post = fetching.post = verbFuncBody('post');
 
 /**
  * Fetch the given `url` by header `PUT` method
@@ -440,7 +530,7 @@ fetching.post = verbFuncBody('post');
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
-fetching.put = verbFuncBody('put');
+export const put = fetching.put = verbFuncBody('put');
 
 /**
  * Fetch the given `url` by header `PATCH` method
@@ -460,7 +550,7 @@ fetching.put = verbFuncBody('put');
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
-fetching.patch = verbFuncBody('patch');
+export const patch = fetching.patch = verbFuncBody('patch');
 
 /**
  * Fetch the given `url` by header `DELETE` method
@@ -480,7 +570,10 @@ fetching.patch = verbFuncBody('patch');
  * @param options optional `Fetch` options.
  * @returns A promise response body of given response action type, only if **status text** is `OK`
  */
-fetching.del = verbFuncBody('delete');
+export const del = fetching.del = verbFuncBody('delete');
+export {
+    del as delete
+};
 
 /**
  * Fetch the given `url` by header `DELETE` method
@@ -511,21 +604,4 @@ fetching['delete'] = verbFuncBody('delete');
  */
 fetching.fetch = fetch;
 
-module.exports = exports = fetching;
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-exports.default = exports;
-exports.isArray = isArray;
-exports.isArrayBuffer = isArrayBuffer;
-exports.isBuffer = isBuffer;
-exports.isString = isString;
-exports.isNumber = isNumber;
-exports.isObject = isObject;
-exports.isPlainObject = isPlainObject;
-exports.isUndefined = isUndefined;
-exports.isBlob = isBlob;
-exports.isFunction = isFunction;
-exports.isDate = isDate;
-exports.isStream = isStream;
+export default fetching;

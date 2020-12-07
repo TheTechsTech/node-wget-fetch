@@ -4,7 +4,7 @@
 
 [![Dependencies Status][david-image]][david-url] [![Node.js CI](https://github.com/techno-express/node-wget-fetch/workflows/Node.js%20CI/badge.svg)](https://github.com/techno-express/node-wget-fetch/actions) [![codecov](https://codecov.io/gh/techno-express/node-wget-fetch/branch/master/graph/badge.svg?token=QJ7L9IN5Y5)](https://codecov.io/gh/techno-express/node-wget-fetch) [![Maintainability][codeclimate-image]][codeclimate-url][![Release][npm-image]][npm-url]
 
-Ultra simple async retrieval of resources or remote files over http or https, an cli tool, and convenience wrapper of [node-fetch](https://www.npmjs.com/package/node-fetch).
+Ultra simple async retrieval of resources or remote files over http or https, an cli tool, convenience wrapper of [node-fetch](https://www.npmjs.com/package/node-fetch), and a seamless retry ability.
 
 ## Install
 
@@ -31,8 +31,7 @@ npm install node-wget-fetch
 
   **default is '`download`'**
 - `options` Standard *Request/Fetch* [Options](https://www.npmjs.com/package/node-fetch#fetch-options) for the HTTP(S) request
-- Returns: **Promise** of `response body` of above **type**, only if **status text** is `OK`
-
+- Returns: **Promise** of `response body` of above **type**, only if **status text** is `OK`.
 - The **response type** will set _Fetch/Request_ **header** `'Content-Type'` as:
   - '`json`' = 'application/json; charset=utf-8'
   - '`text`' = 'application/x-www-form-urlencoded'
@@ -43,25 +42,42 @@ npm install node-wget-fetch
   - '`stream`' = 'application/octet'
   - '`array`' = 'application/octet'
 
+To customize `retry` *Fetch* operation, update in `options`.
+
+```js
+retry:
+{
+    retries: 1, // The maximum amount of times to retry the operation.
+    factor: 2, //The exponential factor to use.
+    minTimeout: 1000, // The number of milliseconds before starting the first retry.
+    maxTimeout: 'Infinity', // The maximum number of milliseconds between two retries.
+    randomize: false, // Randomizes the timeouts by multiplying with a factor between 1 to 2.
+ }
+```
+
 ## Convenience Request Methods
 
-**fetching.get**(`url`, `response_body_type` [, `options`]);
+**import { get, head, options } from 'node-wget-fetch';**
 
-**fetching.head**(`url`, `response_body_type` [, `options`]);
+**get**(`url`, `response_body_type` [, `options`]);
 
-**fetching.options**(`url`, `response_body_type` [, `options`);]
+**head**(`url`, `response_body_type` [, `options`]);
+
+**options**(`url`, `response_body_type` [, `options`);]
 
 ### For simply submitting `body` data
 
 > Note: `body` data is passed in, handled by **URLSearchParams** _class_, if `String` or `Object`.
 
-**fetching.post**(`url`, `body`, `response_body_type` [, `options`]);
+**import { post, put, patch, delete } from 'node-wget-fetch';**
 
-**fetching.put**(`url`, `body`, `response_body_type` [, `options`]);
+**post**(`url`, `body`, `response_body_type` [, `options`]);
 
-**fetching.patch**(`url`, `body`, `response_body_type` [, `options`]);
+**put**(`url`, `body`, `response_body_type` [, `options`]);
 
-**fetching.delete**(`url`, `body`, `response_body_type` [, `options`]);
+**patch**(`url`, `body`, `response_body_type` [, `options`]);
+
+**delete**(`url`, `body`, `response_body_type` [, `options`]);
 
 ## Bring in or access [node-fetch](https://www.npmjs.com/package/node-fetch) directly
 
@@ -70,17 +86,22 @@ npm install node-wget-fetch
 ## Usage
 
 ```javascript
+// CommonJS
 const fetching = require('node-wget-fetch');
+const wget = fetching.wget;
 
-fetching.wget(url) // retrieve to current directory
+// ESM 12+
+import { wget } from 'node-wget-fetch';
+
+wget(url) // retrieve to current directory
     .then((info) => {});
     .catch((error) => {});
 
-fetching.wget(url, { headers:  { Accept: '*/*' } }) // with optional `Fetch` options
+wget(url, { headers:  { Accept: '*/*' } }) // with optional `Fetch` options
     .then((info) => {});
     .catch((error) => {});
 
-fetching.wget(url, destination_folder_or_filename, { timeout: 2000 } )  // with optional `Fetch` options
+wget(url, destination_folder_or_filename, { timeout: 2000 } )  // with optional `Fetch` options
     .then((info) => {});
     .catch((error) => {});
 
@@ -107,7 +128,7 @@ fetching(url, responseType, // *responseType* can be:
 ## Examples
 
 ```javascript
-const wget = require('node-wget-fetch');
+import { wget } from 'node-wget-fetch';
 
 wget('https://raw.github.com/techno-express/node-wget-fetch/master/angleman.png'); // angleman.png saved to current folder
 

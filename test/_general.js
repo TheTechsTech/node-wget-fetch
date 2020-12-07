@@ -1,12 +1,20 @@
-const should = require('should'),
-    fs = require('fs'),
-    Stream = require('stream'),
-    dst_dir = './test/tmp/',
-    filename = 'angleman.png',
-    dst_path = dst_dir + filename,
-    rel_path = './' + filename,
-    src_path = 'https://github.com/techno-express/node-wget/raw/master/',
-    src_url = src_path + filename;
+import should from 'should';
+import {
+    unlinkSync
+} from 'fs';
+import {
+    Readable,
+    Transform
+} from 'stream';
+import fetching from '../wget-fetch.js';
+const exist = should.exist;
+const not = should.not;
+const dst_dir = './test/tmp/';
+const filename = 'angleman.png';
+const dst_path = dst_dir + filename;
+const rel_path = './' + filename;
+const src_path = 'https://github.com/techno-express/node-wget/raw/master/';
+const src_url = src_path + filename;
 
 class Blob { };
 Object.defineProperty(Blob.prototype, Symbol.toStringTag, {
@@ -19,18 +27,11 @@ Object.defineProperty(Blob.prototype, Symbol.toStringTag, {
 describe('node-wget-fetch', function () {
     describe('should', function () {
 
-        it("load", function () {
-            var fetching = require('../wget-fetch.js');
-            should.exist(fetching);
-        });
-
-        var fetching = require('../wget-fetch.js');
-
         it("return relative filepath: " + rel_path, function () {
             fetching(rel_path, {
                 dry: true
             }).then(result => {
-                should.exist(result);
+                exist(result);
                 result.filepath.should.equal(rel_path);
             });
         });
@@ -39,7 +40,7 @@ describe('node-wget-fetch', function () {
             fetching(src_url, dst_dir, {
                 dry: true
             }).then(testPath => {
-                should.exist(testPath);
+                exist(testPath);
                 testPath.filepath.should.equal(dst_path);
             });;
         });
@@ -54,7 +55,7 @@ describe('node-wget-fetch', function () {
             fetching.wget(src_url, dst_path)
                 .then(data => {
                     holdData = data;
-                    fs.unlinkSync(dst_path);
+                    unlinkSync(dst_path);
                     done(); // complete the async beforeEach
                 })
                 .catch(err => {
@@ -63,11 +64,11 @@ describe('node-wget-fetch', function () {
         });
 
         it("load " + dst_path + " from " + src_url, function () {
-            should.not.exist(holdErr);
-            should.exist(holdData);
-            should.exist(holdData.filepath);
-            should.exist(holdData.fileSize);
-            should.exist(holdData.headers);
+            not.exist(holdErr);
+            exist(holdData);
+            exist(holdData.filepath);
+            exist(holdData.fileSize);
+            exist(holdData.headers);
             holdData.fileSizeMatch.should.equal(true)
         });
 
@@ -136,7 +137,7 @@ describe('node-wget-fetch', function () {
         });
 
         it('validate Stream', function () {
-            fetching.isStream(new Stream.Readable()).should.equal(true);
+            fetching.isStream(new Readable()).should.equal(true);
             fetching.isStream({
                 foo: 'bar'
             }).should.equal(false);
@@ -159,7 +160,7 @@ describe('node-wget-fetch', function () {
             fetching.get('https://httpbin.org/get', 'object').then(res => {
                 res.should.be.an.instanceof(fetching.fetch.Response);
                 res.headers.should.be.an.instanceof(fetching.fetch.Headers);
-                res.body.should.be.an.instanceof(Stream.Transform);
+                res.body.should.be.an.instanceof(Transform);
                 res.bodyUsed.should.be.false;
                 res.ok.should.be.true;
                 res.status.should.equal(200);
@@ -208,39 +209,122 @@ describe('node-wget-fetch', function () {
         it('resolve on response action of HEADER from GET method', function () {
             fetching.get('https://httpbin.org/get', 'header').then(res => {
                 fetching.isObject(res).should.be.true;
-                should.exist(res.connection);
+                exist(res.connection);
             });
         });
 
         it('resolve on response action of STREAM from POST method', function () {
-            fetching.post('https://httpbin.org/post', { stuff: 1 }, 'stream').then(res => {
+            fetching.post('https://httpbin.org/post', {
+                stuff: 1
+            }, 'stream').then(res => {
                 fetching.isStream(res).should.be.true;
             });
         });
 
         it('resolve on response action of ARRAY from PUT method and BODY as OBJECT', function () {
-            fetching.put('https://httpbin.org/put', { stuff: 2 }, 'array').then(res => {
+            fetching.put('https://httpbin.org/put', {
+                stuff: 2
+            }, 'array').then(res => {
                 fetching.isArrayBuffer(res).should.be.true;
             });
         });
 
         it('resolve on response action of TEXT from PATCH method in OPTIONS parameter', function () {
             fetching('https://httpbin.org/patch',
-                'text',
-                { method: 'PATCH', body: new URLSearchParams('stuff=3') })
+                'text', {
+                method: 'PATCH',
+                body: new URLSearchParams('stuff=3')
+            })
                 .then(res => {
                     fetching.isString(res).should.be.true;
                 });
         });
 
         it('resolve on file retrieval no destination set with OPTIONS parameter instead', function () {
-            fetching.wget('https://github.com/techno-express/node-wget-fetch/blob/master/test/tmp/Image.bmp',
-                { headers: { 'User-Agent': 'node-wget-fetch/1.0'}, compress: false, size: 1 })
+            fetching.wget('https://github.com/techno-express/node-wget-fetch/blob/master/test/tmp/Image.bmp', {
+                headers: {
+                    'User-Agent': 'node-wget-fetch/1.0'
+                },
+                compress: false,
+                size: 1
+            })
                 .then(res => {
                     fetching.isArray(res).should.be.true;
-                    fs.unlinkSync(res.filepath);
+                    unlinkSync(res.filepath);
                 });
         });
     });
 
+    describe('resolve', () => {
+        it('should resolve on third attempt', done => {
+            var trial = 0;
+            fetching.retryPromise({ retries: 10, minTimeout: 200, factor: 1 }, (resolve, retry, reject) => {
+                trial++;
+                if (trial == 3) { return resolve('ok'); }
+                else { return retry('nok'); }
+            })
+                .then(result => {
+                    result.should.equal('ok');
+                    trial.should.equal(3);
+                    done();
+                })
+                .catch(error => { throw new Error('should not be rejected'); });
+        });
+    });
+
+    describe('reject', () => {
+        it('should simply reject', () => {
+            fetching.retryPromise((resolve, retry, reject) => {
+                setTimeout(() => reject('nok'), 250);
+            }).catch((err) => {
+                err.should.equal('nok');
+            });
+        });
+    });
+
+
+    describe('retries', () => {
+        it('should do three retries and then reject', done => {
+            var trial = 0;
+            fetching.retryPromise({ retries: 3, minTimeout: 200, factor: 1 }, (resolve, retry, reject) => {
+                trial++;
+                retry('nok');
+            })
+                .then(result => {
+                    throw new Error('should not resolve');
+                })
+                .catch(error => {
+                    error.should.equal('nok');
+                    trial.should.equal(3);
+                    done();
+                });
+        });
+    });
+
+    describe('retries', () => {
+        it('should not allow multiple retries in one cycle', done => {
+            var trial = 0;
+            fetching.retryPromise({ retries: 3, minTimeout: 200, factor: 1 }, (resolve, retry, reject) => {
+                trial++;
+                if (trial == 1) {
+                    retry('this retry should be accepted');
+                    retry('this retry should be ignored');
+                }
+                else if (trial == 2) {
+                    resolve('ok');
+                }
+                else {
+                    throw new Error('should not retry more than once');
+                }
+            })
+                .then(result => {
+                    result.should.equal('ok');
+                    trial.should.equal(2);
+                    done();
+                })
+                .catch(error => {
+                    throw new Error('should not be rejected');
+                });
+        });
+    });
 });
