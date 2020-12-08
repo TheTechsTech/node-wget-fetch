@@ -242,6 +242,7 @@ describe('node-wget-fetch', function () {
 
         it('resolve on file retrieval no destination set with OPTIONS parameter instead', function () {
             fetching.wget('https://github.com/techno-express/node-wget-fetch/blob/master/test/tmp/Image.bmp', {
+                retry: { retries: 5, factor: 2 },
                 headers: {
                     'User-Agent': 'node-wget-fetch/1.0'
                 },
@@ -273,15 +274,28 @@ describe('node-wget-fetch', function () {
     });
 
     describe('reject', () => {
-        it('should simply reject', () => {
+        it('should simply reject', done => {
             fetching.retryPromise((resolve, retry, reject) => {
                 setTimeout(() => reject('nok'), 250);
             }).catch((err) => {
                 err.should.equal('nok');
+                done();
             });
         });
     });
 
+    describe('Error on options', () => {
+        it('should error on minTimeout is greater than maxTimeout', done => {
+            try {
+                fetching.retryPromise({ retries: 5, minTimeout: 10, maxTimeout: 5 }, (resolve, retry, reject) => {
+                    console.log('Should not be displayed.')
+                });
+            } catch (err) {
+                err.should.be.instanceof(Error);
+                done();
+            }
+        });
+    });
 
     describe('retries', () => {
         it('should do three retries and then reject', done => {

@@ -20,17 +20,16 @@ let content_types = {
  * Returns a promise that conditionally tries to resolve multiple times,
  * as specified by the policy.
  *
- * @param {object} options - To specifies the retry policy as:
- *```
- * retry:
+ * @param {object} options - Use to specify the `retry` policy as:
+ * ```js
  * {
- *  retries: `1` - The maximum amount of times to retry the operation.
- *  factor: `2` - The exponential factor to use.
- *  minTimeout: `1000` - The number of milliseconds before starting the first retry.
- *  maxTimeout: `Infinity` - The maximum number of milliseconds between two retries.
- *  randomize: `false` - Randomizes the timeouts by multiplying with a factor between 1 to 2.
+ *   retries: 1, // The maximum amount of times to retry the operation.
+ *   factor: 2, // The exponential factor to use.
+ *   minTimeout: 1000, // The number of milliseconds before starting the first retry.
+ *   maxTimeout: Infinity, // The maximum number of milliseconds between two retries.
+ *   randomize: false // Randomizes the timeouts by multiplying with a factor between 1 to 2.
  * }
- *```
+ * ```
  * @param {function} executor - A function that is called for each attempt to resolve the promise.
  * Executor function called as `(resolveFn, retryFn, rejectFn)`;
  *  - `resolveFn` - To be called when the promise resolves normally.
@@ -208,6 +207,7 @@ function fetching(url, action = '', options = {}) {
                                     info.headers = res.headers.raw();
                                     return resolve(info);
                                 });
+                                /* c8 ignore next 4 */
                                 writer.on('error', (err) => {
                                     writer.end();
                                     return retry(err);
