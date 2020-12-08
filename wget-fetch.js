@@ -20,10 +20,8 @@ let content_types = {
  * Returns a promise that conditionally tries to resolve multiple times,
  * as specified by the policy.
  *
- * @param {object} options - Either An object that specifies the retry policy.
- * An object that specifies the retry policy.
- *
- * ```
+ * @param {object} options - To specifies the retry policy as:
+ *```
  * retry:
  * {
  *  retries: `1` - The maximum amount of times to retry the operation.
@@ -32,7 +30,7 @@ let content_types = {
  *  maxTimeout: `Infinity` - The maximum number of milliseconds between two retries.
  *  randomize: `false` - Randomizes the timeouts by multiplying with a factor between 1 to 2.
  * }
- * ```
+ *```
  * @param {function} executor - A function that is called for each attempt to resolve the promise.
  * Executor function called as `(resolveFn, retryFn, rejectFn)`;
  *  - `resolveFn` - To be called when the promise resolves normally.
@@ -113,7 +111,15 @@ export const retryPromise = fetching.retryPromise = function (options, executor)
  * - '`stream`' for **NodeJs.readableStream()**
  *
  * **default is '`download`'**
- * @param {Object} options Fetch/Request options
+ * @param {Object} options Fetch/Request options and to specify the `retry` policy as:
+ * ```js
+ * { retry: { retries: 1, // The maximum amount of times to retry the operation.
+ *    factor: 2, // The exponential factor to use.
+ *   minTimeout: 1000, // The number of milliseconds before starting the first retry.
+ *   maxTimeout: Infinity, // The maximum number of milliseconds between two retries.
+ *   randomize: false // Randomizes the timeouts by multiplying with a factor between 1 to 2.
+ * }}
+ * ```
  * @return {Promise} Promise of `response body` of above **type**, only if **status text** is `OK`
  */
 function fetching(url, action = '', options = {}) {

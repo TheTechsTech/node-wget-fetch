@@ -8,20 +8,21 @@
  * Dependencies.
  */
 
-var fetching = require('./');
-var pack = require('./package.json');
+import { wget } from './';
+const require = createRequire(import.meta.url);
+const pack = require('../package.json');
 
 /*
  * Arguments.
  */
 
-var argv = process.argv.slice(2);
+let argv = process.argv.slice(2);
 
 /*
  * Command.
  */
 
-var command = Object.keys(pack.bin)[0];
+let command = Object.keys(pack.bin)[0];
 
 /**
  * Help.
@@ -63,9 +64,9 @@ if (
 ) {
   console.log(pack.version);
 } else if (argv.length) {
-  var destinationIndex = argv.indexOf('--destination') + argv.indexOf('-d') + 2;
+  let destinationIndex = argv.indexOf('--destination') + argv.indexOf('-d') + 2;
 
-  var args = {};
+  let args = {};
   if (destinationIndex) {
     args.dest = argv[destinationIndex];
     argv.splice(destinationIndex - 1, 2);
@@ -73,11 +74,11 @@ if (
   args.url = firstNonFlag(argv);
   if (args.url.length > 0) {
     console.log("Downloading...");
-    fetching(args.url, args.dest)
+    wget(args.url, args.dest, { retry: { retries: 5 } })
       .then((info) => {
         console.log('Done!');
         console.log('The file ' + info.filepath + ' size' +
-          (info.retrievedSizeMatch ? '' : " don't") + ' match!');
+          (info.fileSizeMatch ? '' : " don't") + ' match!');
       })
       .catch((error) => {
         console.log('--- error:');
@@ -91,7 +92,7 @@ if (
 }
 
 function firstNonFlag(args) {
-  for (var i = 0; i < args.length; i++) {
+  for (let i = 0; i < args.length; i++) {
     if (args[i].charAt(0) != '-') {
       return args[i];
     }
