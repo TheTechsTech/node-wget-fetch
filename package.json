@@ -46,7 +46,7 @@
     "README.md"
   ],
   "dependencies": {
-    "node-fetch": "~2.6.2"
+    "node-fetch": "~2.6.4"
   },
   "devDependencies": {
     "mocha": "^8.2.1",
