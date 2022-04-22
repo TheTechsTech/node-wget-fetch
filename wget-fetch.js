@@ -611,3 +611,6 @@ fetching['delete'] = verbFuncBody('delete');
 fetching.fetch = fetch;
 
 export default fetching;
+export {
+    fetching
+};

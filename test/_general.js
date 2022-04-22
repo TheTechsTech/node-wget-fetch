@@ -6,7 +6,7 @@ import {
     Readable,
     Transform
 } from 'stream';
-import fetching from '../wget-fetch.js';
+import { fetching } from '../wget-fetch.js';
 const exist = should.exist;
 const not = should.not;
 const dst_dir = './test/tmp/';
